@@ -49,7 +49,7 @@ int main(int argc, char **argv)
 	}
 
 	const char *model_path = argv[1];
-	const char *image_path = argv[2];
+	//const char *image_path = argv[2];
 
 	int ret;
 	rknn_app_context_t rknn_app_ctx;
@@ -93,7 +93,7 @@ int main(int argc, char **argv)
 		printf(">>>> %d\n", __LINE__);
 		//cap.release();
 #endif
-
+		const char *image_path = "out.jpg";
 		image_buffer_t src_image;
 		memset(&src_image, 0, sizeof(image_buffer_t));
 		//src_image.width = img.rows;
