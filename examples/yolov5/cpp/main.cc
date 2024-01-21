@@ -29,7 +29,7 @@
     #include "dma_alloc.cpp"
 #endif
 
-#define OPENCV 0
+#define OPENCV 1
 #if OPENCV
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
@@ -93,8 +93,14 @@ int main(int argc, char **argv)
 		printf(">>>> %d\n", __LINE__);
 		//cap.release();
 #endif
+
 		image_buffer_t src_image;
 		memset(&src_image, 0, sizeof(image_buffer_t));
+		//src_image.width = img.rows;
+		//src_image.height = img.cols;
+		//src_image.virt_addr = img.data;
+		//src_image.format = IMAGE_FORMAT_RGB888;
+		//src_image.size = img.rows * img.cols * 3;
 		ret = read_image(image_path, &src_image);
 
 #if defined(RV1106_1103) 

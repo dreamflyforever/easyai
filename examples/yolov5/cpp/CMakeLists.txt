@@ -39,7 +39,7 @@ target_link_libraries(${PROJECT_NAME}
     fileutils
     imagedrawing    
     ${LIBRKNNRT}
-    #${OpenCV_LIBS}
+    ${OpenCV_LIBS}
 )
 
 if (CMAKE_SYSTEM_NAME STREQUAL "Android")
