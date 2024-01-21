@@ -29,102 +29,143 @@
     #include "dma_alloc.cpp"
 #endif
 
+#define OPENCV 0
+#if OPENCV
+#include <opencv2/core/core.hpp>
+#include <opencv2/highgui/highgui.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
+
+#include <unistd.h>
+#endif
 /*-------------------------------------------
                   Main Function
 -------------------------------------------*/
 int main(int argc, char **argv)
 {
-    if (argc != 3)
-    {
-        printf("%s <model_path> <image_path>\n", argv[0]);
-        return -1;
-    }
+	if (argc != 3)
+	{
+		printf("%s <model_path> <image_path>\n", argv[0]);
+		return -1;
+	}
 
-    const char *model_path = argv[1];
-    const char *image_path = argv[2];
+	const char *model_path = argv[1];
+	const char *image_path = argv[2];
 
-    int ret;
-    rknn_app_context_t rknn_app_ctx;
-    memset(&rknn_app_ctx, 0, sizeof(rknn_app_context_t));
+	int ret;
+	rknn_app_context_t rknn_app_ctx;
+	memset(&rknn_app_ctx, 0, sizeof(rknn_app_context_t));
 
-    init_post_process();
+	init_post_process();
 
-    ret = init_yolov5_model(model_path, &rknn_app_ctx);
-    if (ret != 0)
-    {
-        printf("init_yolov5_model fail! ret=%d model_path=%s\n", ret, model_path);
-        goto out;
-    }
+	ret = init_yolov5_model(model_path, &rknn_app_ctx);
+	if (ret != 0)
+	{
+		printf("init_yolov5_model fail! ret=%d model_path=%s\n", ret, model_path);
+		while (1);
+		//goto out;
+	}
+#if OPENCV
+	printf(">>>> %d\n", __LINE__);
+	cv::VideoCapture cap;
+	printf(">>>> %d\n", __LINE__);
+	cap.set(cv::CAP_PROP_FRAME_WIDTH, 320);
+	printf(">>>> %d\n", __LINE__);
+	cap.set(cv::CAP_PROP_FRAME_HEIGHT, 240);
+	printf(">>>> %d\n", __LINE__);
+	cap.open(0);
 
-    image_buffer_t src_image;
-    memset(&src_image, 0, sizeof(image_buffer_t));
-    ret = read_image(image_path, &src_image);
-
-#if defined(RV1106_1103) 
-    //RV1106 rga requires that input and output bufs are memory allocated by dma
-    ret = dma_buf_alloc(RV1106_CMA_HEAP_PATH, src_image.size, &rknn_app_ctx.img_dma_buf.dma_buf_fd, 
-                       (void **) & (rknn_app_ctx.img_dma_buf.dma_buf_virt_addr));
-    memcpy(rknn_app_ctx.img_dma_buf.dma_buf_virt_addr, src_image.virt_addr, src_image.size);
-    dma_sync_cpu_to_device(rknn_app_ctx.img_dma_buf.dma_buf_fd);
-    free(src_image.virt_addr);
-    src_image.virt_addr = (unsigned char *)rknn_app_ctx.img_dma_buf.dma_buf_virt_addr;
+	printf(">>>> %d\n", __LINE__);
+	const int w = cap.get(cv::CAP_PROP_FRAME_WIDTH);
+	const int h = cap.get(cv::CAP_PROP_FRAME_HEIGHT);
+	fprintf(stderr, "[w,h] %d x %d\n", w, h);
 #endif
 
-    if (ret != 0)
-    {
-        printf("read image fail! ret=%d image_path=%s\n", ret, image_path);
-        goto out;
-    }
+	while (1) {
+#if OPENCV
+		cv::Mat bgr[9];
+		for (int i = 0; i < 9; i++)
+		{
+			cap >> bgr[i];
+		}
+		cv::Mat img;
+		cv::cvtColor(bgr[8], img, cv::COLOR_BGR2RGB);
+		cv::imwrite("out.jpg", img);
+		printf(">>>> %d\n", __LINE__);
+		//cap.release();
+#endif
+		image_buffer_t src_image;
+		memset(&src_image, 0, sizeof(image_buffer_t));
+		ret = read_image(image_path, &src_image);
 
-    object_detect_result_list od_results;
+#if defined(RV1106_1103) 
+		//RV1106 rga requires that input and output bufs are memory allocated by dma
+		ret = dma_buf_alloc(RV1106_CMA_HEAP_PATH, src_image.size, &rknn_app_ctx.img_dma_buf.dma_buf_fd, 
+				(void **) & (rknn_app_ctx.img_dma_buf.dma_buf_virt_addr));
+		memcpy(rknn_app_ctx.img_dma_buf.dma_buf_virt_addr, src_image.virt_addr, src_image.size);
+		dma_sync_cpu_to_device(rknn_app_ctx.img_dma_buf.dma_buf_fd);
+		free(src_image.virt_addr);
+		src_image.virt_addr = (unsigned char *)rknn_app_ctx.img_dma_buf.dma_buf_virt_addr;
+#endif
 
-    ret = inference_yolov5_model(&rknn_app_ctx, &src_image, &od_results);
-    if (ret != 0)
-    {
-        printf("init_yolov5_model fail! ret=%d\n", ret);
-        goto out;
-    }
+		if (ret != 0)
+		{
+			printf("read image fail! ret=%d image_path=%s\n", ret, image_path);
+			while (1);
+			//goto out;
+		}
 
-    // 画框和概率
-    char text[256];
-    for (int i = 0; i < od_results.count; i++)
-    {
-        object_detect_result *det_result = &(od_results.results[i]);
-        printf("%s @ (%d %d %d %d) %.3f\n", coco_cls_to_name(det_result->cls_id),
-               det_result->box.left, det_result->box.top,
-               det_result->box.right, det_result->box.bottom,
-               det_result->prop);
-        int x1 = det_result->box.left;
-        int y1 = det_result->box.top;
-        int x2 = det_result->box.right;
-        int y2 = det_result->box.bottom;
+		object_detect_result_list od_results;
 
-        draw_rectangle(&src_image, x1, y1, x2 - x1, y2 - y1, COLOR_BLUE, 3);
+		ret = inference_yolov5_model(&rknn_app_ctx, &src_image, &od_results);
+		if (ret != 0)
+		{
+			printf("init_yolov5_model fail! ret=%d\n", ret);
+			while (1);
+			//goto out;
+		}
 
-        sprintf(text, "%s %.1f%%", coco_cls_to_name(det_result->cls_id), det_result->prop * 100);
-        draw_text(&src_image, text, x1, y1 - 20, COLOR_RED, 10);
-    }
+		// 画框和概率
+		char text[256];
+		for (int i = 0; i < od_results.count; i++)
+		{
+			object_detect_result *det_result = &(od_results.results[i]);
+			printf("%s @ (%d %d %d %d) %.3f\n", coco_cls_to_name(det_result->cls_id),
+					det_result->box.left, det_result->box.top,
+					det_result->box.right, det_result->box.bottom,
+					det_result->prop);
+			int x1 = det_result->box.left;
+			int y1 = det_result->box.top;
+			int x2 = det_result->box.right;
+			int y2 = det_result->box.bottom;
 
-    write_image("out.png", &src_image);
+			draw_rectangle(&src_image, x1, y1, x2 - x1, y2 - y1, COLOR_BLUE, 3);
 
+			sprintf(text, "%s %.1f%%", coco_cls_to_name(det_result->cls_id), det_result->prop * 100);
+			draw_text(&src_image, text, x1, y1 - 20, COLOR_RED, 10);
+		}
+
+		write_image("out.png", &src_image);
+	}
+#if 0
 out:
-    deinit_post_process();
+	deinit_post_process();
 
-    ret = release_yolov5_model(&rknn_app_ctx);
-    if (ret != 0)
-    {
-        printf("release_yolov5_model fail! ret=%d\n", ret);
-    }
+	ret = release_yolov5_model(&rknn_app_ctx);
+	if (ret != 0)
+	{
+		printf("release_yolov5_model fail! ret=%d\n", ret);
+	}
 
-    if (src_image.virt_addr != NULL)
-    {
+	if (src_image.virt_addr != NULL)
+	{
 #if defined(RV1106_1103) 
-        dma_buf_free(rknn_app_ctx.img_dma_buf.size, &rknn_app_ctx.img_dma_buf.dma_buf_fd, 
-                rknn_app_ctx.img_dma_buf.dma_buf_virt_addr);
+		dma_buf_free(rknn_app_ctx.img_dma_buf.size, &rknn_app_ctx.img_dma_buf.dma_buf_fd, 
+				rknn_app_ctx.img_dma_buf.dma_buf_virt_addr);
 #else
-        free(src_image.virt_addr);
+		free(src_image.virt_addr);
 #endif
-    }
+	}
+#endif
 
-    return 0;
+	return 0;
 }
