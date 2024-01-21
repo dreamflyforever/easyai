@@ -68,9 +68,9 @@ int main(int argc, char **argv)
 	printf(">>>> %d\n", __LINE__);
 	cv::VideoCapture cap;
 	printf(">>>> %d\n", __LINE__);
-	cap.set(cv::CAP_PROP_FRAME_WIDTH, 320);
+	cap.set(cv::CAP_PROP_FRAME_WIDTH, 640);
 	printf(">>>> %d\n", __LINE__);
-	cap.set(cv::CAP_PROP_FRAME_HEIGHT, 240);
+	cap.set(cv::CAP_PROP_FRAME_HEIGHT, 640);
 	printf(">>>> %d\n", __LINE__);
 	cap.open(0);
 
@@ -80,79 +80,77 @@ int main(int argc, char **argv)
 	fprintf(stderr, "[w,h] %d x %d\n", w, h);
 #endif
 
-	while (1) {
 #if OPENCV
-		cv::Mat bgr[9];
-		for (int i = 0; i < 9; i++)
-		{
-			cap >> bgr[i];
-		}
-		cv::Mat img;
-		cv::cvtColor(bgr[8], img, cv::COLOR_BGR2RGB);
-		cv::imwrite("out.jpg", img);
-		printf(">>>> %d\n", __LINE__);
-		//cap.release();
+	cv::Mat bgr[9];
+	for (int i = 0; i < 9; i++)
+	{
+		cap >> bgr[i];
+	}
+	cv::Mat img;
+	cv::cvtColor(bgr[8], img, cv::COLOR_BGR2RGB);
+	cv::imwrite("out.jpg", img);
+	printf(">>>> %d\n", __LINE__);
+	//cap.release();
 #endif
-		const char *image_path = "out.jpg";
-		image_buffer_t src_image;
-		memset(&src_image, 0, sizeof(image_buffer_t));
-		//src_image.width = img.rows;
-		//src_image.height = img.cols;
-		//src_image.virt_addr = img.data;
-		//src_image.format = IMAGE_FORMAT_RGB888;
-		//src_image.size = img.rows * img.cols * 3;
-		ret = read_image(image_path, &src_image);
+	const char *image_path = "out.jpg";
+	image_buffer_t src_image;
+	memset(&src_image, 0, sizeof(image_buffer_t));
+	//src_image.width = img.rows;
+	//src_image.height = img.cols;
+	//src_image.virt_addr = img.data;
+	//src_image.format = IMAGE_FORMAT_RGB888;
+	//src_image.size = img.rows * img.cols * 3;
+	ret = read_image(image_path, &src_image);
 
 #if defined(RV1106_1103) 
-		//RV1106 rga requires that input and output bufs are memory allocated by dma
-		ret = dma_buf_alloc(RV1106_CMA_HEAP_PATH, src_image.size, &rknn_app_ctx.img_dma_buf.dma_buf_fd, 
-				(void **) & (rknn_app_ctx.img_dma_buf.dma_buf_virt_addr));
-		memcpy(rknn_app_ctx.img_dma_buf.dma_buf_virt_addr, src_image.virt_addr, src_image.size);
-		dma_sync_cpu_to_device(rknn_app_ctx.img_dma_buf.dma_buf_fd);
-		free(src_image.virt_addr);
-		src_image.virt_addr = (unsigned char *)rknn_app_ctx.img_dma_buf.dma_buf_virt_addr;
+	//RV1106 rga requires that input and output bufs are memory allocated by dma
+	ret = dma_buf_alloc(RV1106_CMA_HEAP_PATH, src_image.size, &rknn_app_ctx.img_dma_buf.dma_buf_fd, 
+			(void **) & (rknn_app_ctx.img_dma_buf.dma_buf_virt_addr));
+	memcpy(rknn_app_ctx.img_dma_buf.dma_buf_virt_addr, src_image.virt_addr, src_image.size);
+	dma_sync_cpu_to_device(rknn_app_ctx.img_dma_buf.dma_buf_fd);
+	free(src_image.virt_addr);
+	src_image.virt_addr = (unsigned char *)rknn_app_ctx.img_dma_buf.dma_buf_virt_addr;
 #endif
 
-		if (ret != 0)
-		{
-			printf("read image fail! ret=%d image_path=%s\n", ret, image_path);
-			while (1);
-			//goto out;
-		}
-
-		object_detect_result_list od_results;
-
-		ret = inference_yolov5_model(&rknn_app_ctx, &src_image, &od_results);
-		if (ret != 0)
-		{
-			printf("init_yolov5_model fail! ret=%d\n", ret);
-			while (1);
-			//goto out;
-		}
-
-		// 画框和概率
-		char text[256];
-		for (int i = 0; i < od_results.count; i++)
-		{
-			object_detect_result *det_result = &(od_results.results[i]);
-			printf("%s @ (%d %d %d %d) %.3f\n", coco_cls_to_name(det_result->cls_id),
-					det_result->box.left, det_result->box.top,
-					det_result->box.right, det_result->box.bottom,
-					det_result->prop);
-			int x1 = det_result->box.left;
-			int y1 = det_result->box.top;
-			int x2 = det_result->box.right;
-			int y2 = det_result->box.bottom;
-
-			draw_rectangle(&src_image, x1, y1, x2 - x1, y2 - y1, COLOR_BLUE, 3);
-
-			sprintf(text, "%s %.1f%%", coco_cls_to_name(det_result->cls_id), det_result->prop * 100);
-			draw_text(&src_image, text, x1, y1 - 20, COLOR_RED, 10);
-		}
-
-		write_image("out.png", &src_image);
+	if (ret != 0)
+	{
+		printf("read image fail! ret=%d image_path=%s\n", ret, image_path);
+		while (1);
+		//goto out;
 	}
-#if 0
+
+	object_detect_result_list od_results;
+
+	ret = inference_yolov5_model(&rknn_app_ctx, &src_image, &od_results);
+	if (ret != 0)
+	{
+		printf("init_yolov5_model fail! ret=%d\n", ret);
+		while (1);
+		//goto out;
+	}
+
+	// 画框和概率
+	char text[256];
+	for (int i = 0; i < od_results.count; i++)
+	{
+		object_detect_result *det_result = &(od_results.results[i]);
+		printf("%s @ (%d %d %d %d) %.3f\n", coco_cls_to_name(det_result->cls_id),
+				det_result->box.left, det_result->box.top,
+				det_result->box.right, det_result->box.bottom,
+				det_result->prop);
+		int x1 = det_result->box.left;
+		int y1 = det_result->box.top;
+		int x2 = det_result->box.right;
+		int y2 = det_result->box.bottom;
+
+		draw_rectangle(&src_image, x1, y1, x2 - x1, y2 - y1, COLOR_BLUE, 3);
+
+		sprintf(text, "%s %.1f%%", coco_cls_to_name(det_result->cls_id), det_result->prop * 100);
+		draw_text(&src_image, text, x1, y1 - 20, COLOR_RED, 10);
+	}
+
+	write_image("out.png", &src_image);
+#if 1
 out:
 	deinit_post_process();
 
