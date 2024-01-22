@@ -17,6 +17,7 @@ typedef struct {
     float scale;
 } letterbox_t;
 
+int read_image_from_memory(const char* path, int size, image_buffer_t* image);
 /**
  * @brief Read image file (support png/jpeg/bmp)
  * 

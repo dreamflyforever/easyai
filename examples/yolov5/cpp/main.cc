@@ -95,12 +95,28 @@ int main(int argc, char **argv)
 	const char *image_path = "out.jpg";
 	image_buffer_t src_image;
 	memset(&src_image, 0, sizeof(image_buffer_t));
-	//src_image.width = img.rows;
-	//src_image.height = img.cols;
-	//src_image.virt_addr = img.data;
-	//src_image.format = IMAGE_FORMAT_RGB888;
-	//src_image.size = img.rows * img.cols * 3;
-	ret = read_image(image_path, &src_image);
+#if 1
+	src_image.width = img.rows;
+	src_image.height = img.cols;
+	//img.data - 1232952;
+	src_image.format = IMAGE_FORMAT_RGB888;
+	src_image.size = img.rows * img.cols * 3;
+	src_image.virt_addr = (unsigned char*)malloc(src_image.size);
+	memcpy(src_image.virt_addr, img.data, src_image.size);
+#endif
+	//ret = read_image(image_path, &src_image);
+
+	//ret = read_image_from_memory((char *)img.data, (img.rows * img.cols * 3), &src_image);
+	printf("%d \n", src_image.width);
+	printf("%d \n", src_image.height);
+
+	printf("%d \n", src_image.width_stride);
+	printf("%d \n", src_image.height_stride);
+	
+	printf("%x, %x\n", src_image.virt_addr, img.data);
+	printf("format: %d\n", src_image.format);
+	printf("fd: %d\n", src_image.fd);
+	printf("size: %d , %d\n", src_image.size, img.rows * img.cols * 3);
 
 #if defined(RV1106_1103) 
 	//RV1106 rga requires that input and output bufs are memory allocated by dma

@@ -47,8 +47,12 @@ static int image_file_filter(const struct dirent *entry)
     }
     return 0;
 }
-
+#define JPEG_PATH 1
+#if JPEG_PATH
 static int read_image_jpeg(const char* path, image_buffer_t* image)
+#else
+static int read_image_jpeg(const char* path, int img_size, image_buffer_t* image)
+#endif
 {
     FILE* jpegFile = NULL;
     unsigned long jpegSize;
@@ -60,7 +64,7 @@ static int read_image_jpeg(const char* path, image_buffer_t* image)
     unsigned long size;
     unsigned short orientation = 1;
     struct timeval tv1, tv2;
-
+#if JPEG_PATH
     if ((jpegFile = fopen(path, "rb")) == NULL) {
         printf("open input file failure\n");
     }
@@ -79,7 +83,15 @@ static int read_image_jpeg(const char* path, image_buffer_t* image)
     }
     fclose(jpegFile);
     jpegFile = NULL;
+#else
+    jpegSize = (unsigned long)img_size;
+    if ((jpegBuf = (unsigned char*)malloc(jpegSize * sizeof(unsigned char))) == NULL) {
+        printf("allocating JPEG buffer\n");
+    }
 
+    memcpy(jpegBuf, path, jpegSize);
+
+#endif
     tjhandle handle = NULL;
     int subsample, colorspace;
     int padding = 1;
@@ -239,9 +251,14 @@ static int read_image_stb(const char* path, image_buffer_t* image)
     }
     return 0;
 }
-
+#if JPEG_PATH
 int read_image(const char* path, image_buffer_t* image)
 {
+#else
+int read_image_from_memory(const char* path, int size, image_buffer_t* image)
+{
+    return read_image_jpeg(path, size, image);
+#endif
     const char* _ext = strrchr(path, '.');
     if (!_ext) {
         // missing extension
@@ -251,7 +268,11 @@ int read_image(const char* path, image_buffer_t* image)
         return read_image_raw(path, image);
     } else if (strcmp(_ext, ".jpg") == 0 || strcmp(_ext, ".jpeg") == 0 || strcmp(_ext, ".JPG") == 0 ||
         strcmp(_ext, ".JPEG") == 0) {
+#if JPEG_PATH
         return read_image_jpeg(path, image);
+#else
+        return read_image_jpeg(path, size, image);
+#endif
     } else {
         return read_image_stb(path, image);
     }
