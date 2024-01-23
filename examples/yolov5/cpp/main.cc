@@ -34,17 +34,36 @@
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
-
-#include <unistd.h>
 #endif
+#include <unistd.h>
+int framecount = 0;
+time_t lasttime;
+void updatefps()
+{
+	framecount++;
+
+	time_t currentTime;
+	time(&currentTime);
+
+	double deltaTime = difftime(currentTime, lasttime);
+
+	if (deltaTime >= 1) {
+		double fps = framecount / deltaTime;
+
+		printf(">>>>>>>> FPS: %.2f\n", fps);
+
+		framecount = 0;
+		time(&lasttime);
+	}
+}
 /*-------------------------------------------
                   Main Function
 -------------------------------------------*/
 int main(int argc, char **argv)
 {
-	if (argc != 3)
+	if (argc != 2)
 	{
-		printf("%s <model_path> <image_path>\n", argv[0]);
+		printf("%s <model_path>\n", argv[0]);
 		return -1;
 	}
 
@@ -171,7 +190,8 @@ int main(int argc, char **argv)
 			sprintf(text, "%s %.1f%%", coco_cls_to_name(det_result->cls_id), det_result->prop * 100);
 			draw_text(&src_image, text, x1, y1 - 20, COLOR_RED, 10);
 		}
-
+		updatefps();
+#if 0
 		char *str = (char *)malloc(20);
 		memset(str, 0, 20);
 		static int t = 0;
@@ -179,6 +199,7 @@ int main(int argc, char **argv)
 		write_image(str, &src_image);
 		free(str);
 		t++;
+#endif
 	}
 #if 1
 out:
