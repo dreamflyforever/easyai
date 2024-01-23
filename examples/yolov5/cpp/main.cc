@@ -56,6 +56,8 @@ void updatefps()
 		time(&lasttime);
 	}
 }
+double __get_us(struct timeval t) { return (t.tv_sec * 1000000 + t.tv_usec); }
+
 /*-------------------------------------------
                   Main Function
 -------------------------------------------*/
@@ -66,6 +68,7 @@ int main(int argc, char **argv)
 		printf("%s <model_path>\n", argv[0]);
 		return -1;
 	}
+	struct timeval start_time, stop_time;
 
 	const char *model_path = argv[1];
 	//const char *image_path = argv[2];
@@ -154,13 +157,21 @@ int main(int argc, char **argv)
 	}
 
 	while (1) {
+
+		gettimeofday(&start_time, NULL);
 		cap >> bgr[0];
+		gettimeofday(&stop_time, NULL);
+		printf("read camera use %f ms\n", (__get_us(stop_time) - __get_us(start_time)) / 1000);
 		
+		start_time = stop_time;
 		cv::Mat img;
 		cv::cvtColor(bgr[0], img, cv::COLOR_BGR2RGB);
-
 		memcpy(src_image.virt_addr, img.data, src_image.size);
 
+		gettimeofday(&stop_time, NULL);
+		printf("preprocess use %f ms\n", (__get_us(stop_time) - __get_us(start_time)) / 1000);
+
+		start_time = stop_time;
 		object_detect_result_list od_results;
 
 		ret = inference_yolov5_model(&rknn_app_ctx, &src_image, &od_results);
@@ -170,7 +181,9 @@ int main(int argc, char **argv)
 			while (1);
 			//goto out;
 		}
-
+		gettimeofday(&stop_time, NULL);
+		printf("inference use %f ms\n", (__get_us(stop_time) - __get_us(start_time)) / 1000);
+#if 1
 		// 画框和概率
 		char text[256];
 		for (int i = 0; i < od_results.count; i++)
@@ -190,6 +203,7 @@ int main(int argc, char **argv)
 			sprintf(text, "%s %.1f%%", coco_cls_to_name(det_result->cls_id), det_result->prop * 100);
 			draw_text(&src_image, text, x1, y1 - 20, COLOR_RED, 10);
 		}
+#endif
 		updatefps();
 #if 0
 		char *str = (char *)malloc(20);
