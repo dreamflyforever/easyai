@@ -9,7 +9,7 @@ if (ENABLE_ASAN)
 	set (CMAKE_LINKER_FLAGS_DEBUG "${CMAKE_LINKER_FLAGS_DEBUG} -fno-omit-frame-pointer -fsanitize=address")
 endif ()
 
-set(OpenCV_DIR "/home/opencv-mobile-4.9.0-luckfox-pico/lib/cmake/opencv4")
+set(OpenCV_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../../../3rdparty/opencv-mobile-4.9.0-luckfox-pico/lib/cmake/opencv4")
 find_package(OpenCV REQUIRED)
 
 set(rknpu2_yolov5_file rknpu2/yolov5.cc)
