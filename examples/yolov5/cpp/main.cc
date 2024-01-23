@@ -96,11 +96,10 @@ int main(int argc, char **argv)
 	image_buffer_t src_image;
 	memset(&src_image, 0, sizeof(image_buffer_t));
 #if 1
-	src_image.width = img.rows;
-	src_image.height = img.cols;
-	//img.data - 1232952;
+	src_image.width = 640;//img.rows;
+	src_image.height = 640;//img.cols;
 	src_image.format = IMAGE_FORMAT_RGB888;
-	src_image.size = img.rows * img.cols * 3;
+	src_image.size = 1228800;//img.rows * img.cols * 3;
 	src_image.virt_addr = (unsigned char*)malloc(src_image.size);
 	memcpy(src_image.virt_addr, img.data, src_image.size);
 #endif
@@ -135,37 +134,52 @@ int main(int argc, char **argv)
 		//goto out;
 	}
 
-	object_detect_result_list od_results;
+	while (1) {
+		cap >> bgr[0];
+		
+		cv::Mat img;
+		cv::cvtColor(bgr[0], img, cv::COLOR_BGR2RGB);
 
-	ret = inference_yolov5_model(&rknn_app_ctx, &src_image, &od_results);
-	if (ret != 0)
-	{
-		printf("init_yolov5_model fail! ret=%d\n", ret);
-		while (1);
-		//goto out;
+		memcpy(src_image.virt_addr, img.data, src_image.size);
+
+		object_detect_result_list od_results;
+
+		ret = inference_yolov5_model(&rknn_app_ctx, &src_image, &od_results);
+		if (ret != 0)
+		{
+			printf("init_yolov5_model fail! ret=%d\n", ret);
+			while (1);
+			//goto out;
+		}
+
+		// 画框和概率
+		char text[256];
+		for (int i = 0; i < od_results.count; i++)
+		{
+			object_detect_result *det_result = &(od_results.results[i]);
+			printf("%s @ (%d %d %d %d) %.3f\n", coco_cls_to_name(det_result->cls_id),
+					det_result->box.left, det_result->box.top,
+					det_result->box.right, det_result->box.bottom,
+					det_result->prop);
+			int x1 = det_result->box.left;
+			int y1 = det_result->box.top;
+			int x2 = det_result->box.right;
+			int y2 = det_result->box.bottom;
+
+			draw_rectangle(&src_image, x1, y1, x2 - x1, y2 - y1, COLOR_BLUE, 3);
+
+			sprintf(text, "%s %.1f%%", coco_cls_to_name(det_result->cls_id), det_result->prop * 100);
+			draw_text(&src_image, text, x1, y1 - 20, COLOR_RED, 10);
+		}
+
+		char *str = (char *)malloc(20);
+		memset(str, 0, 20);
+		static int t = 0;
+		sprintf(str, "%d_out.jpeg", t);
+		write_image(str, &src_image);
+		free(str);
+		t++;
 	}
-
-	// 画框和概率
-	char text[256];
-	for (int i = 0; i < od_results.count; i++)
-	{
-		object_detect_result *det_result = &(od_results.results[i]);
-		printf("%s @ (%d %d %d %d) %.3f\n", coco_cls_to_name(det_result->cls_id),
-				det_result->box.left, det_result->box.top,
-				det_result->box.right, det_result->box.bottom,
-				det_result->prop);
-		int x1 = det_result->box.left;
-		int y1 = det_result->box.top;
-		int x2 = det_result->box.right;
-		int y2 = det_result->box.bottom;
-
-		draw_rectangle(&src_image, x1, y1, x2 - x1, y2 - y1, COLOR_BLUE, 3);
-
-		sprintf(text, "%s %.1f%%", coco_cls_to_name(det_result->cls_id), det_result->prop * 100);
-		draw_text(&src_image, text, x1, y1 - 20, COLOR_RED, 10);
-	}
-
-	write_image("out.png", &src_image);
 #if 1
 out:
 	deinit_post_process();
