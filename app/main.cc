@@ -24,6 +24,11 @@ int main(int argc, char **argv)
 		write_image(str, &(entity->src_image));
 		free(str);
 		t++;
+		/* because the flash is only 24MB*/
+		if (t == 50) {
+			os_printf("reach the amount of picutre, exit...\n");
+			break;
+		}
 #endif
 	}
 	session_deinit(entity);
