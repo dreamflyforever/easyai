@@ -10,11 +10,6 @@
 #include "image_utils.h"
 #include "file_utils.h"
 #include "image_drawing.h"
-
-#if defined(RV1106_1103) 
-    #include "dma_alloc.cpp"
-#endif
-
 #define OPENCV 1
 #if OPENCV
 #include <opencv2/core/core.hpp>
@@ -36,6 +31,10 @@ typedef struct session_str {
 	USER_CB cb;
 	object_detect_result_list od_results;
 } session_str;
+
+int camera_init(session_str * entity);
+cv::Mat camera_read(session_str * entity);
+void updatefps();
 
 /* user API for AI engine */
 int preprocess(session_str * entity);

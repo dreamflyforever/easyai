@@ -29,8 +29,9 @@ file(GLOB SRCS ${CMAKE_CURRENT_SOURCE_DIR}/*.cc)
 
 
 add_executable(${PROJECT_NAME}
-    main.cc
+    core.cc
     postprocess.cc
+    ../app/main.cc
     ${rknpu2_yolov5_file}
 )
 

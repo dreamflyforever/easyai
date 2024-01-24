@@ -4,6 +4,10 @@
 */
 #include "core.h"
 
+#if defined(RV1106_1103) 
+    #include "dma_alloc.cpp"
+#endif
+
 struct timeval start_time, stop_time;
 int framecount = 0;
 time_t lasttime;
@@ -149,6 +153,7 @@ int inference(session_str * entity)
 /*-------------------------------------------
                   Main Function
 -------------------------------------------*/
+#if 0
 int main(int argc, char **argv)
 {
 	if (argc != 2)
@@ -308,3 +313,4 @@ out:
 
 	return 0;
 }
+#endif
