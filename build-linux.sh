@@ -1,6 +1,7 @@
 #!/bin/bash
 TARGET_SOC=rv1106
 TARGET_ARCH=armhf
+GCC_COMPILER=arm-rockchip830-linux-uclibcgnueabihf
 set -e
 if [[ -z ${GCC_COMPILER} ]];then
     if [[ ${TARGET_SOC} = "rv1106"  || ${TARGET_SOC} = "rv1103" ]];then
