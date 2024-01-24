@@ -1,17 +1,7 @@
-// Copyright (c) 2023 by Rockchip Electronics Co., Ltd. All Rights Reserved.
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-
+/*
+** easyai core.cc
+**
+*/
 /*-------------------------------------------
                 Includes
 -------------------------------------------*/
@@ -36,6 +26,19 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #endif
 #include <unistd.h>
+
+typedef int (*USER_CB) (void * p_arg);
+
+typedef struct session_str {
+	rknn_app_context_t ctx;
+	image_buffer_t src;
+	int model_width;
+	int model_height;
+	int model_channel = 3;
+	cv::Mat orig_img;
+	USER_CB cb;
+} session_str;
+
 int framecount = 0;
 time_t lasttime;
 void updatefps()
@@ -125,19 +128,6 @@ int main(int argc, char **argv)
 	src_image.virt_addr = (unsigned char*)malloc(src_image.size);
 	memcpy(src_image.virt_addr, img.data, src_image.size);
 #endif
-	//ret = read_image(image_path, &src_image);
-
-	//ret = read_image_from_memory((char *)img.data, (img.rows * img.cols * 3), &src_image);
-	printf("%d \n", src_image.width);
-	printf("%d \n", src_image.height);
-
-	printf("%d \n", src_image.width_stride);
-	printf("%d \n", src_image.height_stride);
-	
-	printf("%x, %x\n", src_image.virt_addr, img.data);
-	printf("format: %d\n", src_image.format);
-	printf("fd: %d\n", src_image.fd);
-	printf("size: %d , %d\n", src_image.size, img.rows * img.cols * 3);
 
 #if defined(RV1106_1103) 
 	//RV1106 rga requires that input and output bufs are memory allocated by dma
@@ -238,3 +228,4 @@ out:
 
 	return 0;
 }
+
