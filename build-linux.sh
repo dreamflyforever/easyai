@@ -1,50 +1,7 @@
 #!/bin/bash
-
+TARGET_SOC=rv1106
+TARGET_ARCH=armhf
 set -e
-
-echo "$0 $@"
-while getopts ":t:a:d:b:m" opt; do
-  case $opt in
-    t)
-      TARGET_SOC=$OPTARG
-      ;;
-    a)
-      TARGET_ARCH=$OPTARG
-      ;;
-    b)
-      BUILD_TYPE=$OPTARG
-      ;;
-    m)
-      ENABLE_ASAN=ON
-      export ENABLE_ASAN=TRUE
-      ;;
-    d)
-      BUILD_DEMO_NAME=$OPTARG
-      ;;
-    :)
-      echo "Option -$OPTARG requires an argument." 
-      exit 1
-      ;;
-    ?)
-      echo "Invalid option: -$OPTARG index:$OPTIND"
-      ;;
-  esac
-done
-
-if [ -z ${TARGET_SOC} ] || [ -z ${BUILD_DEMO_NAME} ]; then
-  echo "$0 -t <target> -a <arch> -d <build_demo_name> [-b <build_type>] [-m]"
-  echo ""
-  echo "    -t : target (rk356x/rk3588/rv1106)"
-  echo "    -a : arch (aarch64/armhf)"
-  echo "    -d : demo name"
-  echo "    -b : build_type(Debug/Release)"
-  echo "    -m : enable address sanitizer, build_type need set to Debug"
-  echo "such as: $0 -t rk3588 -a aarch64 -d mobilenet"
-  echo "Note: 'rk356x' represents rk3562/rk3566/rk3568, 'rv1106' represents rv1103/rv1106"
-  echo ""
-  exit -1
-fi
-
 if [[ -z ${GCC_COMPILER} ]];then
     if [[ ${TARGET_SOC} = "rv1106"  || ${TARGET_SOC} = "rv1103" ]];then
         echo "Please set GCC_COMPILER for $TARGET_SOC"
@@ -77,31 +34,32 @@ if [[ -z ${ENABLE_ASAN} ]];then
     ENABLE_ASAN=OFF
 fi
 
-for demo_path in `find examples -name ${BUILD_DEMO_NAME}`
-do
-    if [ -d "$demo_path/cpp" ]
-    then
-        BUILD_DEMO_PATH="$demo_path/cpp"
-        break;
-    fi
-done
-
-if [[ -z "${BUILD_DEMO_PATH}" ]]
-then
-    echo "Cannot find demo: ${BUILD_DEMO_NAME}, only support:"
-
-    for demo_path in `find examples -name cpp`
-    do
-        if [ -d "$demo_path" ]
-        then
-            dname=`dirname "$demo_path"`
-            name=`basename $dname`
-            echo "$name"
-        fi
-    done
-    echo "rv1106_rv1103 only support: mobilenet and yolov5"
-    exit
-fi
+BUILD_DEMO_PATH=kernel
+#for demo_path in `find examples -name ${BUILD_DEMO_NAME}`
+#do
+#    if [ -d "$demo_path/cpp" ]
+#    then
+#        BUILD_DEMO_PATH="$demo_path/cpp"
+#        break;
+#    fi
+#done
+#
+#if [[ -z "${BUILD_DEMO_PATH}" ]]
+#then
+#    echo "Cannot find demo: ${BUILD_DEMO_NAME}, only support:"
+#
+#    for demo_path in `find examples -name cpp`
+#    do
+#        if [ -d "$demo_path" ]
+#        then
+#            dname=`dirname "$demo_path"`
+#            name=`basename $dname`
+#            echo "$name"
+#        fi
+#    done
+#    echo "rv1106_rv1103 only support: mobilenet and yolov5"
+#    exit
+#fi
 
 case ${TARGET_SOC} in
     rk356x)
@@ -170,17 +128,3 @@ cmake ../../${BUILD_DEMO_PATH} \
     -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}
 make -j4
 make install
-
-# Check if there is a rknn model in the install directory
-suffix=".rknn"
-shopt -s nullglob
-if [ -d "$INSTALL_DIR" ]; then
-    files=("$INSTALL_DIR/model/"/*"$suffix")
-    shopt -u nullglob
-
-    if [ ${#files[@]} -le 0 ]; then
-        echo -e "\e[91mThe RKNN model can not be found in \"$INSTALL_DIR/model\", please check!\e[0m"
-    fi
-else
-    echo -e "\e[91mInstall directory \"$INSTALL_DIR\" does not exist, please check!\e[0m"
-fi
