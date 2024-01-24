@@ -32,22 +32,42 @@ void updatefps()
 double __get_us(struct timeval t) { return (t.tv_sec * 1000000 + t.tv_usec); }
 
 
+cv::VideoCapture g_cap;
+cv::Mat g_bgr;
 int camera_init(session_str * entity)
 {
 	int retval = 0;
+	if (entity == NULL) {
+		os_printf("hello\n");
+		while (1);
+	}
+	g_cap.set(cv::CAP_PROP_FRAME_WIDTH, 640);
+	g_cap.set(cv::CAP_PROP_FRAME_HEIGHT, 640);
+	g_cap.open(0);
+#if 0
+	cv::VideoCapture cap;
+	memcpy(&(entity->cap), &cap, sizeof(cv::VideoCapture));
 	entity->cap.set(cv::CAP_PROP_FRAME_WIDTH, 640);
+	os_printf("hello\n");
 	entity->cap.set(cv::CAP_PROP_FRAME_HEIGHT, 640);
+	os_printf("hello\n");
 	entity->cap.open(0);
+	os_printf("hello\n");
 
 	const int w = entity->cap.get(cv::CAP_PROP_FRAME_WIDTH);
 	const int h = entity->cap.get(cv::CAP_PROP_FRAME_HEIGHT);
 	fprintf(stderr, "[w,h] %d x %d\n", w, h);
+#endif
 	return retval;
 }
 cv::Mat camera_read(session_str * entity)
 {
+#if 0
 	entity->cap >> entity->bgr;
-	return entity->bgr;
+#endif
+	g_cap >> g_bgr;
+	return g_bgr;
+
 }
 
 /* user API for AI engine */
@@ -55,7 +75,7 @@ int preprocess(session_str * entity)
 {
 	start_time = stop_time;
 	cv::Mat img;
-	cv::cvtColor(entity->bgr, img, cv::COLOR_BGR2RGB);
+	cv::cvtColor(g_bgr, img, cv::COLOR_BGR2RGB);
 	memcpy(entity->src_image.virt_addr, img.data, entity->src_image.size);
 	gettimeofday(&stop_time, NULL);
 	printf("preprocess use %f ms\n", (__get_us(stop_time) - __get_us(start_time)) / 1000);
