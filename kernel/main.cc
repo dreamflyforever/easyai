@@ -307,7 +307,27 @@ int session_init(session_str ** entity, const char * model_name)
 	(*entity)->src_image.virt_addr = (unsigned char *)((*entity)->ctx).img_dma_buf.dma_buf_virt_addr;
 	return retval;
 }
-int session_deinit(session_str * entity);
+int session_deinit(session_str * entity)
+{
+	deinit_post_process();
+
+	int ret = release_yolov5_model(&(entity->ctx));
+	if (ret != 0) {
+		printf("release_yolov5_model fail! ret=%d\n", ret);
+	}
+
+	if (entity->src_image.virt_addr != NULL) {
+#if defined(RV1106_1103) 
+		dma_buf_free(entity->ctx.img_dma_buf.size, &(entity->ctx).img_dma_buf.dma_buf_fd, 
+				entity->ctx.img_dma_buf.dma_buf_virt_addr);
+#else
+		free(entity->src_image.virt_addr);
+#endif
+	}
+
+	free(entity);
+	return ret;
+}
 int inference(session_str * entity)
 {
 	int retval;
