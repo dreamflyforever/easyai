@@ -30,13 +30,15 @@
 typedef int (*USER_CB) (void * p_arg);
 
 typedef struct session_str {
+	/*camera*/
+	cv::VideoCapture cap;
+	/*origin image*/	
+	cv::Mat bgr;
+
 	rknn_app_context_t ctx;
-	image_buffer_t src;
-	int model_width;
-	int model_height;
-	int model_channel = 3;
-	cv::Mat orig_img;
+	image_buffer_t src_image;
 	USER_CB cb;
+	object_detect_result_list od_results;
 } session_str;
 
 int framecount = 0;
@@ -64,6 +66,7 @@ double __get_us(struct timeval t) { return (t.tv_sec * 1000000 + t.tv_usec); }
 /*-------------------------------------------
                   Main Function
 -------------------------------------------*/
+struct timeval start_time, stop_time;
 int main(int argc, char **argv)
 {
 	if (argc != 2)
@@ -71,7 +74,6 @@ int main(int argc, char **argv)
 		printf("%s <model_path>\n", argv[0]);
 		return -1;
 	}
-	struct timeval start_time, stop_time;
 
 	const char *model_path = argv[1];
 	//const char *image_path = argv[2];
@@ -90,16 +92,12 @@ int main(int argc, char **argv)
 		//goto out;
 	}
 #if OPENCV
-	printf(">>>> %d\n", __LINE__);
+	//camera_init();
 	cv::VideoCapture cap;
-	printf(">>>> %d\n", __LINE__);
 	cap.set(cv::CAP_PROP_FRAME_WIDTH, 640);
-	printf(">>>> %d\n", __LINE__);
 	cap.set(cv::CAP_PROP_FRAME_HEIGHT, 640);
-	printf(">>>> %d\n", __LINE__);
 	cap.open(0);
 
-	printf(">>>> %d\n", __LINE__);
 	const int w = cap.get(cv::CAP_PROP_FRAME_WIDTH);
 	const int h = cap.get(cv::CAP_PROP_FRAME_HEIGHT);
 	fprintf(stderr, "[w,h] %d x %d\n", w, h);
@@ -229,3 +227,101 @@ out:
 	return 0;
 }
 
+int camera_init(session_str * entity)
+{
+	int retval = 0;
+	entity->cap.set(cv::CAP_PROP_FRAME_WIDTH, 640);
+	entity->cap.set(cv::CAP_PROP_FRAME_HEIGHT, 640);
+	entity->cap.open(0);
+
+	const int w = entity->cap.get(cv::CAP_PROP_FRAME_WIDTH);
+	const int h = entity->cap.get(cv::CAP_PROP_FRAME_HEIGHT);
+	fprintf(stderr, "[w,h] %d x %d\n", w, h);
+	return retval;
+}
+cv::Mat camera_read(session_str * entity)
+{
+	entity->cap >> entity->bgr;
+	return entity->bgr;
+}
+
+/* user API for AI engine */
+int preprocess(session_str * entity)
+{
+	start_time = stop_time;
+	cv::Mat img;
+	cv::cvtColor(entity->bgr, img, cv::COLOR_BGR2RGB);
+	memcpy(entity->src_image.virt_addr, img.data, entity->src_image.size);
+	gettimeofday(&stop_time, NULL);
+	printf("preprocess use %f ms\n", (__get_us(stop_time) - __get_us(start_time)) / 1000);
+	return 0;
+}
+int postprocess(session_str * entity)
+{
+	int retval = 0;
+	char text[256];
+	for (int i = 0; i < entity->od_results.count; i++) {
+		object_detect_result *det_result = &(entity->od_results.results[i]);
+		printf("%s @ (%d %d %d %d) %.3f\n", coco_cls_to_name(det_result->cls_id),
+				det_result->box.left, det_result->box.top,
+				det_result->box.right, det_result->box.bottom,
+				det_result->prop);
+		int x1 = det_result->box.left;
+		int y1 = det_result->box.top;
+		int x2 = det_result->box.right;
+		int y2 = det_result->box.bottom;
+
+		draw_rectangle(&(entity->src_image), x1, y1, x2 - x1, y2 - y1, COLOR_BLUE, 3);
+
+		sprintf(text, "%s %.1f%%", coco_cls_to_name(det_result->cls_id), det_result->prop * 100);
+			draw_text(&(entity->src_image), text, x1, y1 - 20, COLOR_RED, 10);
+		}
+		return retval;
+}
+int session_init(session_str ** entity, const char * model_name)
+{
+	int retval = 0;
+	*entity = (session_str * )malloc(sizeof(session_str));
+
+	memset(&((*entity)->ctx), 0, sizeof(rknn_app_context_t));
+
+	init_post_process();
+
+	int ret = init_yolov5_model(model_name, &((*entity)->ctx));
+	if (ret != 0) {
+		printf("init_yolov5_model fail! ret=%d model_path=%s\n", ret, model_name);
+		while (1);
+		//goto out;
+	}
+	(*entity)->src_image.width = 640;//img.rows;
+	(*entity)->src_image.height = 640;//img.cols;
+	(*entity)->src_image.format = IMAGE_FORMAT_RGB888;
+	(*entity)->src_image.size = 1228800;//img.rows * img.cols * 3;
+	(*entity)->src_image.virt_addr = (unsigned char*)malloc((*entity)->src_image.size);
+	//RV1106 rga requires that input and output bufs are memory allocated by dma
+	ret = dma_buf_alloc(RV1106_CMA_HEAP_PATH, (*entity)->src_image.size, &((*entity)->ctx).img_dma_buf.dma_buf_fd, 
+			(void **) & (((*entity)->ctx).img_dma_buf.dma_buf_virt_addr));
+	memcpy(((*entity)->ctx).img_dma_buf.dma_buf_virt_addr, (*entity)->src_image.virt_addr, (*entity)->src_image.size);
+	dma_sync_cpu_to_device(((*entity)->ctx).img_dma_buf.dma_buf_fd);
+	free((*entity)->src_image.virt_addr);
+	(*entity)->src_image.virt_addr = (unsigned char *)((*entity)->ctx).img_dma_buf.dma_buf_virt_addr;
+	return retval;
+}
+int session_deinit(session_str * entity);
+int inference(session_str * entity)
+{
+	int retval;
+	start_time = stop_time;
+	int ret = inference_yolov5_model(&(entity->ctx), &(entity->src_image), &(entity->od_results));
+	if (ret != 0)
+	{
+		printf("init_yolov5_model fail! ret=%d\n", ret);
+		while (1);
+		//goto out;
+	}
+	gettimeofday(&stop_time, NULL);
+	printf("inference use %f ms\n", (__get_us(stop_time) - __get_us(start_time)) / 1000);
+
+	return retval;
+}
+int set_user_cb(session_str * entity, USER_CB cb);
