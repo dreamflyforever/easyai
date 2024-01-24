@@ -13,6 +13,7 @@ int main(int argc, char **argv)
 	while (1) {
 		camera_read(entity);
 		preprocess(entity);
+		inference(entity);
 		postprocess(entity);
 		updatefps();
 	}
