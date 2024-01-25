@@ -31,6 +31,7 @@ int main(int argc, char **argv)
 		}
 #endif
 	}
+	camera_deinit(entity);
 	session_deinit(entity);
 }
 #endif

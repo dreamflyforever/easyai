@@ -70,6 +70,10 @@ cv::Mat camera_read(session_str * entity)
 
 }
 
+int camera_deinit(session_str * entity)
+{
+	g_cap.release();
+}
 /* user API for AI engine */
 int preprocess(session_str * entity)
 {

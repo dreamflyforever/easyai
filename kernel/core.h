@@ -34,6 +34,7 @@ typedef struct session_str {
 
 int camera_init(session_str * entity);
 cv::Mat camera_read(session_str * entity);
+int camera_deinit(session_str * entity);
 void updatefps();
 
 /* user API for AI engine */
