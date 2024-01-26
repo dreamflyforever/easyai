@@ -37,10 +37,6 @@ cv::Mat g_bgr;
 int camera_init(session_str * entity)
 {
 	int retval = 0;
-	if (entity == NULL) {
-		os_printf("hello\n");
-		while (1);
-	}
 	g_cap.set(cv::CAP_PROP_FRAME_WIDTH, 640);
 	g_cap.set(cv::CAP_PROP_FRAME_HEIGHT, 640);
 	g_cap.open(0);
@@ -73,7 +69,9 @@ cv::Mat camera_read(session_str * entity)
 int camera_deinit(session_str * entity)
 {
 	g_cap.release();
+	return 0;
 }
+
 /* user API for AI engine */
 int preprocess(session_str * entity)
 {
@@ -136,6 +134,7 @@ int session_init(session_str ** entity, const char * model_name)
 	(*entity)->src_image.virt_addr = (unsigned char *)((*entity)->ctx).img_dma_buf.dma_buf_virt_addr;
 	return retval;
 }
+
 int session_deinit(session_str * entity)
 {
 	deinit_post_process();
@@ -338,3 +337,64 @@ out:
 	return 0;
 }
 #endif
+
+session_cls :: session_cls(char * model_name)
+{
+	memset(&(this->ctx), 0, sizeof(rknn_app_context_t));
+
+	init_post_process();
+
+	int ret = init_yolov5_model(model_name, &(this->ctx));
+	if (ret != 0) {
+		printf("init_yolov5_model fail! ret=%d model_path=%s\n", ret, model_name);
+		while (1);
+		//goto out;
+	}
+	this->src_image.width = 640;//img.rows;
+	this->src_image.height = 640;//img.cols;
+	this->src_image.format = IMAGE_FORMAT_RGB888;
+	this->src_image.size = 1228800;//img.rows * img.cols * 3;
+	this->src_image.virt_addr = (unsigned char*)malloc((this)->src_image.size);
+	//RV1106 rga requires that input and output bufs are memory allocated by dma
+	ret = dma_buf_alloc(RV1106_CMA_HEAP_PATH, (this)->src_image.size, &((this)->ctx).img_dma_buf.dma_buf_fd, 
+			(void **) & (((this)->ctx).img_dma_buf.dma_buf_virt_addr));
+	memcpy(((this)->ctx).img_dma_buf.dma_buf_virt_addr, (this)->src_image.virt_addr, (this)->src_image.size);
+	dma_sync_cpu_to_device(((this)->ctx).img_dma_buf.dma_buf_fd);
+	free((this)->src_image.virt_addr);
+	(this)->src_image.virt_addr = (unsigned char *)((this)->ctx).img_dma_buf.dma_buf_virt_addr;
+
+}
+
+int session_cls :: cap_init()
+{
+	int retval;
+	retval = camera_init(NULL);
+	return retval;
+}
+
+int session_cls :: cap_read()
+{
+	int retval = 0;
+	camera_read(NULL);
+	return retval;
+}
+
+
+int session_cls :: cap_deinit()
+{
+	int retval;
+	retval = camera_deinit(NULL);
+	return retval;
+}
+
+int session_cls :: preprocess()
+{
+	int retval;
+	start_time = stop_time;
+	cv::Mat img;
+	cv::cvtColor(g_bgr, img, cv::COLOR_BGR2RGB);
+	memcpy(this->src_image.virt_addr, img.data, this->src_image.size);
+	gettimeofday(&stop_time, NULL);
+	printf("preprocess use %f ms\n", (__get_us(stop_time) - __get_us(start_time)) / 1000);
+	return retval;
+}

@@ -45,6 +45,29 @@ int session_deinit(session_str * entity);
 int inference(session_str * entity);
 int set_user_cb(session_str * entity, USER_CB cb);
 
+/* c++ class API*/
+class session_cls {
+	cv::VideoCapture cap;
+	cv::Mat bgr;
+
+	rknn_app_context_t ctx;
+	image_buffer_t src_image;
+	USER_CB cb;
+	object_detect_result_list od_results;
+
+	session_cls(char * model_path);
+	int cap_init();
+	int cap_read();
+	int cap_deinit();
+
+	int preprocess();
+	int postprocess();
+	int session_init(const char * model_name);
+	int session_deinit();
+	int inference();
+	int set_user_cb(USER_CB cb);
+};
+
 /* debug printf*/
 #define DEBUG 1
 #if DEBUG
