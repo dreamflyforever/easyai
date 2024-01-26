@@ -89,10 +89,10 @@ int postprocess(session_str * entity)
 	char text[256];
 	for (int i = 0; i < entity->od_results.count; i++) {
 		object_detect_result *det_result = &(entity->od_results.results[i]);
-		printf("%s @ (%d %d %d %d) %.3f\n", coco_cls_to_name(det_result->cls_id),
+		printf("%s @ (%d %d %d %d) %.3f, id: %d\n", coco_cls_to_name(det_result->cls_id),
 				det_result->box.left, det_result->box.top,
 				det_result->box.right, det_result->box.bottom,
-				det_result->prop);
+				det_result->prop, det_result->cls_id);
 		int x1 = det_result->box.left;
 		int y1 = det_result->box.top;
 		int x2 = det_result->box.right;
@@ -101,10 +101,13 @@ int postprocess(session_str * entity)
 		draw_rectangle(&(entity->src_image), x1, y1, x2 - x1, y2 - y1, COLOR_BLUE, 3);
 
 		sprintf(text, "%s %.1f%%", coco_cls_to_name(det_result->cls_id), det_result->prop * 100);
-			draw_text(&(entity->src_image), text, x1, y1 - 20, COLOR_RED, 10);
-		}
-		return retval;
+		draw_text(&(entity->src_image), text, x1, y1 - 20, COLOR_RED, 10);
+		if (det_result->cls_id == 0)
+			retval = 1;
+	}
+	return retval;
 }
+
 int session_init(session_str ** entity, const char * model_name)
 {
 	int retval = 0;
