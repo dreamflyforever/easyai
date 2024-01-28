@@ -32,6 +32,7 @@ add_executable(${PROJECT_NAME}
     core.cc
     postprocess.cc
     ../app/main.cc
+    ../app/device.cc
     ${rknpu2_yolov5_file}
 )
 
