@@ -27,7 +27,7 @@ int main(int argc, char **argv)
 			printf("detect people ring....\n");
 		}
 		updatefps();
-#if 0
+#if 1
 		char *str = (char *)malloc(20);
 		memset(str, 0, 20);
 		static int t = 0;

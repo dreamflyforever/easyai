@@ -99,7 +99,23 @@ int postprocess(session_str * entity)
 		int y2 = det_result->box.bottom;
 
 		draw_rectangle(&(entity->src_image), x1, y1, x2 - x1, y2 - y1, COLOR_BLUE, 3);
+#if 1
+		char *str = (char *)malloc(20);
+		memset(str, 0, 20);
+		static int t = 0;
+		sprintf(str, "%d_crop.jpg", t);
+		cv::Rect crop_region(x1, y1, x2-x1 , y2-y1);
+		cv::Mat cropped_image = g_bgr(crop_region);
+		cv::imwrite(str, cropped_image);
+		free(str);
+		t++;
+		/* because the flash is only 24MB*/
+		if (t == 50) {
+			os_printf("reach the amount of picutre, exit...\n");
+			break;
+		}
 
+#endif
 		sprintf(text, "%s %.1f%%", coco_cls_to_name(det_result->cls_id), det_result->prop * 100);
 		draw_text(&(entity->src_image), text, x1, y1 - 20, COLOR_RED, 10);
 		if (det_result->cls_id == 0)
