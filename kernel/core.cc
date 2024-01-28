@@ -99,7 +99,7 @@ int postprocess(session_str * entity)
 		int y2 = det_result->box.bottom;
 
 		draw_rectangle(&(entity->src_image), x1, y1, x2 - x1, y2 - y1, COLOR_BLUE, 3);
-#if 1
+#if 0
 		char *str = (char *)malloc(20);
 		memset(str, 0, 20);
 		static int t = 0;
@@ -118,8 +118,7 @@ int postprocess(session_str * entity)
 #endif
 		sprintf(text, "%s %.1f%%", coco_cls_to_name(det_result->cls_id), det_result->prop * 100);
 		draw_text(&(entity->src_image), text, x1, y1 - 20, COLOR_RED, 10);
-		if (det_result->cls_id == 0)
-			retval = 1;
+		retval = (det_result->cls_id == 0) ? 1 : det_result->cls_id;
 	}
 	return retval;
 }
