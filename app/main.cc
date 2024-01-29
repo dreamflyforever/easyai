@@ -25,7 +25,7 @@ int main(int argc, char **argv)
 			printf("detect people ring....\n");
 		}
 		updatefps();
-#if 0
+#if 1
 		char *str = (char *)malloc(20);
 		memset(str, 0, 20);
 		static int t = 0;
@@ -35,8 +35,8 @@ int main(int argc, char **argv)
 		t++;
 		/* because the flash is only 24MB*/
 		if (t == 50) {
-			os_printf("reach the amount of picutre, exit...\n");
-			break;
+			os_printf("reach the amount of picutre, recover picture...\n");
+			t = 0;
 		}
 #endif
 	}
