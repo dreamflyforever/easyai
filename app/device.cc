@@ -4,20 +4,20 @@
 #include <pthread.h>
 #include <assert.h>
 
+static pthread_cond_t cond;
 void * buzzer_run(void * arg);
 
 static pthread_mutex_t buzzer_mtx;
 
 void put_buzzer()
 {
-	pthread_mutex_unlock(&buzzer_mtx);
+	pthread_cond_signal(&cond);
 }
 
 void get_buzzer()
 {
-	pthread_mutex_lock(&buzzer_mtx);
+	pthread_cond_wait(&cond, &buzzer_mtx);/*等待*/
 }
-
 int buzzer_init(int gpio_pin)
 {
 #if 1
@@ -50,6 +50,8 @@ int buzzer_init(int gpio_pin)
 #endif
 	pthread_mutex_init(&buzzer_mtx, NULL);
 	pthread_t buzzer_task;
+	cond = PTHREAD_COND_INITIALIZER;
+
 	int retval = pthread_create(&buzzer_task, NULL, buzzer_run, (int *)gpio_pin);
 	//if (pthread_join(task, NULL) != 0) {
 	//		fprintf(stderr, "Failed to join thread.\n");
@@ -71,14 +73,15 @@ void * buzzer_run(void * arg)
 		assert(0);
 	}
 	while (1) {
+		pthread_mutex_lock(&buzzer_mtx);
 		get_buzzer();
 		printf(">>>>>>>>>>>>>ring.......\n");
 		fprintf(value_file,"1");
 		fflush(value_file);
 		sleep(1);
-
 		fprintf(value_file,"0");
 		fflush(value_file);
+		pthread_mutex_unlock(&buzzer_mtx);
 	}
 
 	fclose(value_file);
