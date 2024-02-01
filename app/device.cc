@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <pthread.h>
+#include <assert.h>
 
 void * buzzer_run(void * arg);
 
@@ -19,27 +20,26 @@ void get_buzzer()
 
 int buzzer_init(int gpio_pin)
 {
-#if 0
+#if 1
 	//export gpio to user
 	FILE * export_file = fopen("/sys/class/gpio/export","w");
 	if (export_file == NULL) {
 		perror("Failed to open GPIO export file");
-		while (1);
+		assert(0);
 		return -1;
 	}
 	fprintf(export_file,"%d",gpio_pin);
 	fclose(export_file);
 
-	printf(">>>>>%d\n", gpio_pin);
 	//get the direction_path
 	char direction_path[50] = {0};
-	snprintf(direction_path, sizeof(direction_path), "sys/class/gpio/gpio%d/direction", gpio_pin);//get the format char
+	snprintf(direction_path, sizeof(direction_path), "/sys/class/gpio/gpio%d/direction", gpio_pin);//get the format char
 									              //specify the pin direction
 	FILE *direction_file = fopen(direction_path,"w");
 	if (direction_file == NULL) {
 		printf("%s\n", direction_path);
-		perror("Failed to open GPUI direction file");
-		while (1);
+		perror("Failed to open GPIO direction file");
+		assert(0);
 		return -1;
 	}
 	fprintf(direction_file,"out");
@@ -50,7 +50,7 @@ int buzzer_init(int gpio_pin)
 #endif
 	pthread_mutex_init(&buzzer_mtx, NULL);
 	pthread_t buzzer_task;
-	int retval = pthread_create(&buzzer_task, NULL, buzzer_run, (void *)&gpio_pin);
+	int retval = pthread_create(&buzzer_task, NULL, buzzer_run, (int *)gpio_pin);
 	//if (pthread_join(task, NULL) != 0) {
 	//		fprintf(stderr, "Failed to join thread.\n");
 	//}
@@ -60,16 +60,15 @@ int buzzer_init(int gpio_pin)
 
 void * buzzer_run(void * arg)
 {
-#if 0
-	int gpio_pin = *(int *)arg;
-	printf(">>>>>%d\n", gpio_pin);
-	char value_path[50];
+#if 1
+	int gpio_pin = (int)(int *)arg;
+	char value_path[50] = {0};
 	snprintf(value_path,sizeof(value_path),
-			"sys/class/gpio/gpio%d/value", gpio_pin);
+			"/sys/class/gpio/gpio%d/value", gpio_pin);
 	FILE *value_file = fopen(value_path,"w");
 	if(value_file == NULL){
-		perror("Failed to open GPIO value file: %d\n");
-		while (1);
+		printf("Failed to open GPIO value file: %s\n", value_path);
+		assert(0);
 	}
 	while (1) {
 		get_buzzer();
@@ -80,7 +79,6 @@ void * buzzer_run(void * arg)
 
 		fprintf(value_file,"0");
 		fflush(value_file);
-		sleep(1);
 	}
 
 	fclose(value_file);
