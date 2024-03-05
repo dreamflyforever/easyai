@@ -95,7 +95,7 @@ int set_hardware_params(int sample_rate, int channels, int format_size)
 	
 	/* set sampling rate */       
     u32 dir;  
-	rc = snd_pcm_hw_params_set_rate_near(gp_handle, gp_params, &sample_rate, &dir); 
+	rc = snd_pcm_hw_params_set_rate_near(gp_handle, gp_params, (unsigned int*)&sample_rate, (int *)&dir); 
 	if (rc < 0) 
 	{    
 		printf("unable to set sampling rate.\n");    
@@ -109,9 +109,9 @@ int set_hardware_params(int sample_rate, int channels, int format_size)
 		goto err1;  
 	} 
 	
-	snd_pcm_hw_params_get_period_size(gp_params, &g_frames, &dir);
+	snd_pcm_hw_params_get_period_size(gp_params, &g_frames, (int *)&dir);
 	g_bufsize = g_frames * 4;
-	gp_buffer = (u8 *)malloc(g_bufsize);
+	gp_buffer = (char *)malloc(g_bufsize);
 	if (gp_buffer == NULL)
 	{
 		printf("malloc failed\n");
@@ -126,7 +126,7 @@ err1:
 }
  
  
-int main(int argc, char *argv[])
+int alsa_play(int argc, char *argv[])
 {
 	if (argc < 3)
 	{

@@ -18,6 +18,8 @@ if (TARGET_SOC STREQUAL "rv1106" OR TARGET_SOC STREQUAL "rv1103")
     set(rknpu2_yolov5_file rknpu2/yolov5_rv1106_1103.cc)
     #dma
     include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../3rdparty/allocator/dma)
+    #alsa 
+    include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../3rdparty/alsa/include)
 endif()
 
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../3rdparty/ 3rdparty.out)
@@ -33,6 +35,7 @@ add_executable(${PROJECT_NAME}
     postprocess.cc
     ../app/main.cc
     ../app/device.cc
+    ../app/alsa.cc
     ${rknpu2_yolov5_file}
 )
 
@@ -42,6 +45,7 @@ target_link_libraries(${PROJECT_NAME}
     imagedrawing    
     ${LIBRKNNRT}
     ${OpenCV_LIBS}
+    ${LIBALSA}
 )
 
 if (CMAKE_SYSTEM_NAME STREQUAL "Android")
@@ -59,6 +63,7 @@ endif()
 target_include_directories(${PROJECT_NAME} PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${LIBRKNNRT_INCLUDES}
+    ${LIBALSA_INCLUDES}
 )
 
 install(TARGETS ${PROJECT_NAME} DESTINATION .)
