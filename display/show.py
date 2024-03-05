@@ -15,6 +15,7 @@ def main():
             i = 0
         if cv2.waitKey(1)&0xFF==ord('q'):#按键盘q就停止拍照
             break
+        os.system("rm " + img)
     cv2.destroyAllWindows()
 
 
