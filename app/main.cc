@@ -1,6 +1,6 @@
 #include "core.h"
 
-extern void put_buzzer();
+extern void put_buzzer(char * speech);
 extern int buzzer_init(int gpio_pin);
 
 int main(int argc, char **argv)
@@ -21,7 +21,7 @@ int main(int argc, char **argv)
 		inference(entity);
 		ret = postprocess(entity);
 		if (ret == 1) {
-			put_buzzer();
+			put_buzzer(NULL);
 			printf("detect people ring....\n");
 		}
 		updatefps();

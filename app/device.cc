@@ -3,15 +3,18 @@
 #include <unistd.h>
 #include <pthread.h>
 #include <assert.h>
+#include <string.h>
 
 static pthread_cond_t cond;
 void * buzzer_run(void * arg);
-
+char g_speech[100];
 static pthread_mutex_t buzzer_mtx;
 
-void put_buzzer()
+extern int alsa_play(char * path);
+void put_buzzer(char * speech)
 {
 	pthread_cond_signal(&cond);
+	strncpy(g_speech, speech, 100);
 }
 
 void get_buzzer()
@@ -76,11 +79,11 @@ void * buzzer_run(void * arg)
 		pthread_mutex_lock(&buzzer_mtx);
 		get_buzzer();
 		printf(">>>>>>>>>>>>>ring.......\n");
-		fprintf(value_file,"1");
-		fflush(value_file);
-		sleep(1);
 		fprintf(value_file,"0");
 		fflush(value_file);
+		fprintf(value_file,"1");
+		fflush(value_file);
+		alsa_play(g_speech);
 		pthread_mutex_unlock(&buzzer_mtx);
 	}
 
