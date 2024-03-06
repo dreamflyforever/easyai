@@ -126,18 +126,14 @@ err1:
 }
  
  
-int alsa_play(int argc, char *argv[])
+int alsa_play(char * path)
 {
-	if (argc < 3)
-	{
-		printf("usage: %s filename.pcm sample_rate channels format_size\n like ./pcmplayer 1.pcm 44100 2 16\n", argv[0]);
-		return -1;
-	}
-	
+	char argv[][10] = {"play", "", "8000", "1", "8"};
+	strcpy(argv[1], path);
+
 	FILE * fp = fopen(argv[1], "r");
-	if (fp == NULL)
-	{
-		printf("can't open wav file\n");
+	if (fp == NULL) {
+		printf("can't open wav file: %s\n", path);
 		return -1;
 	}
 	int sample_rate = atoi(argv[2]);
