@@ -128,6 +128,7 @@ err1:
  
 int alsa_play(char * path)
 {
+	int ret;
 	char argv[][10] = {"play", "", "8000", "1", "8"};
 	strcpy(argv[1], path);
 
@@ -139,13 +140,16 @@ int alsa_play(char * path)
 	int sample_rate = atoi(argv[2]);
 	int channels = atoi(argv[3]);
 	int format_size = atoi(argv[4]);
-	int ret = set_hardware_params(sample_rate, channels, format_size);
-	if (ret < 0)
-	{
-		printf("set_hardware_params error\n");
-		return -1;
+	static int once = 0;
+	if (once == 0) {
+		ret = set_hardware_params(sample_rate, channels, format_size);
+		if (ret < 0) {
+			printf("set_hardware_params error\n");
+			return -1;
+		}
+		printf(">>>>>>>>>>>>>>>>sound card init<<<<<<<<<<<<<<<<<\n");
+		once = 1;
 	}
-	
 	size_t rc;
 	while (1)
 	{
