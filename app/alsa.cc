@@ -129,7 +129,7 @@ err1:
 int alsa_play(char * path)
 {
 	int ret;
-	char argv[][10] = {"play", "", "8000", "1", "8"};
+	char argv[][10] = {"play", "", "8000", "1", "16"};
 	strcpy(argv[1], path);
 
 	FILE * fp = fopen(argv[1], "r");
@@ -148,7 +148,7 @@ int alsa_play(char * path)
 			return -1;
 		}
 		printf(">>>>>>>>>>>>>>>>sound card init<<<<<<<<<<<<<<<<<\n");
-		once = 1;
+		once = 0;
 	}
 	size_t rc;
 	while (1)

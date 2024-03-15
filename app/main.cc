@@ -11,17 +11,18 @@ int main(int argc, char **argv)
 		return -1;
 	}
 	session_str * entity;
+	buzzer_init(55);
 	session_init(&entity, argv[1]);
 	camera_init(entity);
 
-	buzzer_init(55);
+	put_buzzer("./model/welcome.wav");
 	while (1) {
 		camera_read(entity);
 		preprocess(entity);
 		inference(entity);
 		ret = postprocess(entity);
 		if (ret == 1) {
-			put_buzzer(NULL);
+			put_buzzer("./model/check_people.wav");
 			printf("detect people ring....\n");
 		}
 		updatefps();

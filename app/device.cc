@@ -13,8 +13,9 @@ static pthread_mutex_t buzzer_mtx;
 extern int alsa_play(char * path);
 void put_buzzer(char * speech)
 {
-	pthread_cond_signal(&cond);
+	printf("release signal.......\n");
 	strncpy(g_speech, speech, 100);
+	pthread_cond_signal(&cond);
 }
 
 void get_buzzer()
@@ -76,14 +77,16 @@ void * buzzer_run(void * arg)
 		assert(0);
 	}
 	while (1) {
+		printf("wait signal..........................\n");
 		pthread_mutex_lock(&buzzer_mtx);
 		get_buzzer();
-		printf(">>>>>>>>>>>>>ring.......\n");
 		fprintf(value_file,"0");
 		fflush(value_file);
 		fprintf(value_file,"1");
 		fflush(value_file);
+		printf(">>>>>>>>>>>>>%s.......\n", g_speech);
 		alsa_play(g_speech);
+		fprintf(value_file,"0");
 		pthread_mutex_unlock(&buzzer_mtx);
 	}
 
