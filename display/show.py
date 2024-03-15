@@ -2,9 +2,10 @@ import cv2
 import time
 import subprocess
 import os
+i = 0
 def main():
-    i=0
     while(1):
+        global i
         img = str(i) + "_out.jpeg"
         #subprocess.call("adb pull /oem/ws/" + img)
         os.system("adb pull /oem/ws/" + img)
