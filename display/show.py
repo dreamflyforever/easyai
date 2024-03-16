@@ -12,8 +12,6 @@ def main():
         frame = cv2.imread(img)
         cv2.imshow('capture', frame)
         i=i+1
-        if (i == 50):
-            i = 0
         if cv2.waitKey(1)&0xFF==ord('q'):#按键盘q就停止拍照
             break
         os.system("rm " + img)

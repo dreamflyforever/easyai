@@ -32,13 +32,15 @@ int main(int argc, char **argv)
 		static int t = 0;
 		sprintf(str, "%d_out.jpeg", t);
 		write_image(str, &(entity->src_image));
-		free(str);
 		t++;
 		/* because the flash is only 24MB*/
-		if (t == 50) {
+		if (t >= 50) {
 			os_printf("reach the amount of picutre, recover picture...\n");
-			t = 0;
+			memset(str, 0, 20);
+			sprintf(str, "%d_out.jpeg", (t-50));
+			remove(str);
 		}
+		free(str);
 #endif
 	}
 	camera_deinit(entity);
