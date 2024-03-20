@@ -5,6 +5,7 @@ extern int buzzer_init(int gpio_pin);
 
 int main(int argc, char **argv)
 {
+	os_printf("compile time : %s\n", __TIME__);
 	int ret;
 	if (argc != 2) {
 		printf("%s <model_path>\n", argv[0]);
@@ -32,14 +33,15 @@ int main(int argc, char **argv)
 		static int t = 0;
 		sprintf(str, "%d_out.jpeg", t);
 		write_image(str, &(entity->src_image));
-		t++;
 		/* because the flash is only 24MB*/
-		if (t >= 50) {
+		if (t >= 5) {
 			os_printf("reach the amount of picutre, recover picture...\n");
 			memset(str, 0, 20);
-			sprintf(str, "%d_out.jpeg", (t-50));
+			sprintf(str, "%d_out.jpeg", (t-5));
 			remove(str);
+			t = -1;
 		}
+		t++;
 		free(str);
 #endif
 	}
