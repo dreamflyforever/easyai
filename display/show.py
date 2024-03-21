@@ -18,7 +18,9 @@ def main():
         if cv2.waitKey(1)&0xFF==ord('q'):#按键盘q就停止拍照
             break
         t = t + 1
-        os.system("mv " + img + " " + str(t) + ".jpeg")
+        if (i >= 5):
+            i = 0
+        #os.system("mv " + img + " " + str(t) + ".jpeg")
     cv2.destroyAllWindows()
 
 
@@ -28,7 +30,7 @@ if __name__ == '__main__':
             main()
         except Exception:
             if (i >= 5):
-                i = -1
+                i = 0
             print("exception..............................")
             pass
         except KeyboardInterrupt:
