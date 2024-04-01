@@ -129,7 +129,7 @@ err1:
 int alsa_play(char * path)
 {
 	int ret;
-	char argv[][10] = {"play", "", "8000", "1", "16"};
+	char argv[][50] = {"play", "", "8000", "1", "16"};
 	strcpy(argv[1], path);
 
 	FILE * fp = fopen(argv[1], "r");

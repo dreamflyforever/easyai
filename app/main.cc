@@ -16,14 +16,14 @@ int main(int argc, char **argv)
 	session_init(&entity, argv[1]);
 	camera_init(entity);
 
-	put_buzzer("./model/welcome.wav");
+	put_buzzer("/oem/ws/model/welcome.wav");
 	while (1) {
 		camera_read(entity);
 		preprocess(entity);
 		inference(entity);
 		ret = postprocess(entity);
 		if (ret == 1) {
-			put_buzzer("./model/check_people.wav");
+			put_buzzer("/oem/ws/model/check_people.wav");
 			printf("detect people ring....\n");
 		}
 		updatefps();
