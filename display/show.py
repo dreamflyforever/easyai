@@ -12,7 +12,7 @@ def main():
         img = str(i) + "_out.jpeg"
         i=i+1
         #subprocess.call("adb pull /oem/ws/" + img)
-        os.system("adb pull /oem/ws/" + img)
+        os.system("adb pull /" + img)
         frame = cv2.imread(img)
         cv2.imshow('capture', frame)
         if cv2.waitKey(1)&0xFF==ord('q'):#按键盘q就停止拍照
