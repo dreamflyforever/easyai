@@ -416,3 +416,28 @@ int session_cls :: preprocess()
 	printf("preprocess use %f ms\n", (__get_us(stop_time) - __get_us(start_time)) / 1000);
 	return retval;
 }
+
+int calculateImageBrightness(cv::Mat image)
+{
+	int brightness = cv::sum(image).val[0];
+	return brightness;
+}
+
+int detect_is_day()
+{
+	cv::Mat image = g_bgr;
+	if (image.empty()) {
+		printf("无法读取图片。\n");
+		return -1;
+	}
+
+	int averageBrightness = calculateImageBrightness(image);  // 计算图片的亮度平均值
+	printf("bright: %d\n", averageBrightness);
+	if (averageBrightness < 83126523) {
+		printf("is night\n");
+		return 0;
+	} else {
+		printf("is day \n");
+		return 1;
+	}
+}

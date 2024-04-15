@@ -36,6 +36,7 @@ add_executable(${PROJECT_NAME}
     ../app/main.cc
     ../app/device.cc
     ../app/alsa.cc
+    ../app/is_night.cc
     ${rknpu2_yolov5_file}
 )
 

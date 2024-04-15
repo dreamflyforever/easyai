@@ -68,6 +68,8 @@ class session_cls {
 	int set_user_cb(USER_CB cb);
 };
 
+int detect_is_day();
+
 /* debug printf*/
 #define DEBUG 1
 #if DEBUG
