@@ -15,8 +15,8 @@ int main(int argc, char **argv)
 	buzzer_init(55);
 	session_init(&entity, argv[1]);
 	camera_init(entity);
-
 	put_buzzer("/oem/ws/model/welcome.wav");
+	is_night_thread();
 	while (1) {
 		camera_read(entity);
 		preprocess(entity);

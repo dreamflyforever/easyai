@@ -69,6 +69,7 @@ class session_cls {
 };
 
 int detect_is_day();
+int is_night_thread();
 
 /* debug printf*/
 #define DEBUG 1
