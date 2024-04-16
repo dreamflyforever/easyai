@@ -425,19 +425,24 @@ int calculateImageBrightness(cv::Mat image)
 
 int detect_is_day()
 {
+	int retval;
+	int averageBrightness;
 	cv::Mat image = g_bgr;
 	if (image.empty()) {
-		printf("无法读取图片。\n");
-		return -1;
+		printf("error to read picture\n");
+		retval = -1;
+		goto end;
 	}
 
-	int averageBrightness = calculateImageBrightness(image);  // 计算图片的亮度平均值
+	averageBrightness = calculateImageBrightness(image);  // 计算图片的亮度平均值
 	printf("bright: %d\n", averageBrightness);
 	if (averageBrightness < 83126523) {
 		printf("is night\n");
-		return 0;
+		retval = 0;
 	} else {
 		printf("is day \n");
-		return 1;
+		retval = 1;
 	}
+end:
+	return retval;
 }
