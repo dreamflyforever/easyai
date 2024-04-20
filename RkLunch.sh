@@ -119,7 +119,8 @@ post_chk()
 
 	if [ -d "/oem/usr/share/iqfiles" ];then
 		#rkipc -a /oem/usr/share/iqfiles &
-		/oem/ws/rknn_yolov5_demo /userdata/yolov5s-640-640.rknn
+		#/oem/ws/rknn_yolov5_demo /userdata/yolov5s-640-640.rknn
+		/oem/ws/easyai /userdata/sleep_v6.rknn
 	else
 		rkipc &
 	fi

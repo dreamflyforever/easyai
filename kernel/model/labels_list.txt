@@ -1,0 +1,6 @@
+LeftRight
+child
+drowsy
+mobile
+person
+talking

@@ -85,7 +85,7 @@ int preprocess(session_str * entity)
 }
 int postprocess(session_str * entity)
 {
-	int retval = 0;
+	int retval = -1;
 	char text[256];
 	for (int i = 0; i < entity->od_results.count; i++) {
 		object_detect_result *det_result = &(entity->od_results.results[i]);
@@ -118,8 +118,10 @@ int postprocess(session_str * entity)
 #endif
 		sprintf(text, "%s %.1f%%", coco_cls_to_name(det_result->cls_id), det_result->prop * 100);
 		draw_text(&(entity->src_image), text, x1, y1 - 20, COLOR_RED, 10);
-		retval = (det_result->cls_id == 0) ? 1 : det_result->cls_id;
+		retval = det_result->cls_id; 
+		//retval = (det_result->cls_id == 0) ? 1 : det_result->cls_id;
 	}
+	printf("retval: %d\n", retval);
 	return retval;
 }
 

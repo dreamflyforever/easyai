@@ -22,9 +22,31 @@ int main(int argc, char **argv)
 		preprocess(entity);
 		inference(entity);
 		ret = postprocess(entity);
-		if (ret == 1) {
-			put_buzzer("/oem/ws/model/check_people.wav");
-			printf("detect people ring....\n");
+		printf(">>>>>>>>>>>%d\n", ret);
+		switch (ret) {
+		case 0:
+			put_buzzer("/oem/ws/model/leftright.wav");
+			break;
+		case 1:
+			put_buzzer("/oem/ws/model/child.wav");
+			break;
+		case 2:
+			put_buzzer("/oem/ws/model/check_sleep.wav");
+			break;
+		case 3:
+			put_buzzer("/oem/ws/model/mobile.wav");
+			break;
+
+		case 4:
+			put_buzzer("/oem/ws/model/normal.wav");
+			break;
+
+		case 5:
+			put_buzzer("/oem/ws/model/talking.wav");
+			break;
+		default:
+			put_buzzer("/oem/ws/model/verify.wav");
+			break;
 		}
 		updatefps();
 #if 1
