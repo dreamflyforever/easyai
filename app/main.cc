@@ -3,6 +3,8 @@
 extern void put_buzzer(char * speech);
 extern int buzzer_init(int gpio_pin);
 
+int sleep_times;
+
 int main(int argc, char **argv)
 {
 	os_printf("compile time : %s\n", __TIME__);
@@ -23,6 +25,7 @@ int main(int argc, char **argv)
 		inference(entity);
 		ret = postprocess(entity);
 		printf(">>>>>>>>>>>%d\n", ret);
+		(ret == 2) ? sleep_times++ : sleep_times = 0;
 		switch (ret) {
 		case 0:
 			put_buzzer("/oem/ws/model/leftright.wav");
@@ -31,14 +34,15 @@ int main(int argc, char **argv)
 			put_buzzer("/oem/ws/model/child.wav");
 			break;
 		case 2:
-			put_buzzer("/oem/ws/model/check_sleep.wav");
+			if (sleep_times>=2)
+				put_buzzer("/oem/ws/model/check_sleep.wav");
 			break;
 		case 3:
 			put_buzzer("/oem/ws/model/mobile.wav");
 			break;
 
 		case 4:
-			put_buzzer("/oem/ws/model/normal.wav");
+			//put_buzzer("/oem/ws/model/normal.wav");
 			break;
 
 		case 5:
