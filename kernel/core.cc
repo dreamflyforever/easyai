@@ -62,6 +62,8 @@ cv::Mat camera_read(session_str * entity)
 	entity->cap >> entity->bgr;
 #endif
 	g_cap >> g_bgr;
+	transpose(g_bgr, g_bgr);   
+	flip(g_bgr, g_bgr, 0);  //rotate 90 
 	return g_bgr;
 
 }
