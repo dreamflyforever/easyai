@@ -4,6 +4,7 @@ extern void put_buzzer(char * speech);
 extern int buzzer_init(int gpio_pin);
 
 int sleep_times;
+int noeye_times;
 
 int main(int argc, char **argv)
 {
@@ -25,30 +26,32 @@ int main(int argc, char **argv)
 		inference(entity);
 		ret = postprocess(entity);
 		printf(">>>>>>>>>>>%d\n", ret);
-		(ret == 2) ? sleep_times++ : sleep_times = 0;
+		((ret == 2) || (ret == 3) || (ret == 6)) ? sleep_times++ : sleep_times = 0;
+		(ret == -1) ? noeye_times++ : noeye_times = 0;
 		switch (ret) {
-		case 0:
+		case 1:
 			put_buzzer("/oem/ws/model/leftright.wav");
 			break;
-		case 1:
-			put_buzzer("/oem/ws/model/child.wav");
+		case 4:
+			put_buzzer("/oem/ws/model/mobile.wav");
+			//put_buzzer("/oem/ws/model/child.wav");
 			break;
 		case 2:
-			if (sleep_times>=2)
+		case 3:
+		case 6:
+			if (sleep_times>=3)
 				put_buzzer("/oem/ws/model/check_sleep.wav");
 			break;
-		case 3:
-			put_buzzer("/oem/ws/model/mobile.wav");
-			break;
 
-		case 4:
+		case 0:
 			//put_buzzer("/oem/ws/model/normal.wav");
 			break;
 
 		case 5:
-			put_buzzer("/oem/ws/model/talking.wav");
+			//put_buzzer("/oem/ws/model/talking.wav");
 			break;
 		default:
+			if (noeye_times >= 5)
 			put_buzzer("/oem/ws/model/verify.wav");
 			break;
 		}
