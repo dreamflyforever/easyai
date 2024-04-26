@@ -1,6 +1,4 @@
 LeftRight
-child
+normal
 drowsy
 mobile
-person
-talking

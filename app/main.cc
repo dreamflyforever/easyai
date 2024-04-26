@@ -4,6 +4,8 @@ extern void put_buzzer(char * speech);
 extern int buzzer_init(int gpio_pin);
 
 int sleep_times;
+int noface_times;
+int lr_times;
 
 int main(int argc, char **argv)
 {
@@ -26,15 +28,18 @@ int main(int argc, char **argv)
 		ret = postprocess(entity);
 		printf(">>>>>>>>>>>%d\n", ret);
 		(ret == 2) ? sleep_times++ : sleep_times = 0;
+		(ret == -1)? noface_times++ : noface_times = 0;
+		(ret == 0) ? lr_times++ : lr_times = 0;
 		switch (ret) {
 		case 0:
-			put_buzzer("/oem/ws/model/leftright.wav");
+			if (lr_times>=5)
+				put_buzzer("/oem/ws/model/leftright.wav");
 			break;
 		case 1:
-			put_buzzer("/oem/ws/model/child.wav");
+			//put_buzzer("/oem/ws/model/child.wav");
 			break;
 		case 2:
-			if (sleep_times>=2)
+			if (sleep_times>=4)
 				put_buzzer("/oem/ws/model/check_sleep.wav");
 			break;
 		case 3:
@@ -46,10 +51,11 @@ int main(int argc, char **argv)
 			break;
 
 		case 5:
-			put_buzzer("/oem/ws/model/talking.wav");
+			//put_buzzer("/oem/ws/model/talking.wav");
 			break;
 		default:
-			put_buzzer("/oem/ws/model/verify.wav");
+			if (noface_times>=5)
+				put_buzzer("/oem/ws/model/verify.wav");
 			break;
 		}
 		updatefps();

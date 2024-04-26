@@ -73,6 +73,6 @@ install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/model/check_people.wav DESTINATION ./m
 install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/model/welcome.wav DESTINATION ./model)
 install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/model/check_sleep.wav DESTINATION ./model)
 install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/model/normal.wav DESTINATION ./model)
-install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/model/sleep_v6.rknn DESTINATION ./model)
+install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/model/sleep_v36.rknn DESTINATION ./model)
 #file(GLOB RKNN_FILES "${CMAKE_CURRENT_SOURCE_DIR}/../model/*.rknn")
 #install(FILES ${RKNN_FILES} DESTINATION model)

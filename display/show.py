@@ -10,9 +10,11 @@ def main():
         global i
         global t
         img = str(i) + "_out.jpeg"
+        orig_img = str(i) + "_orig.jpeg"
         i=i+1
         #subprocess.call("adb pull /oem/ws/" + img)
         os.system("adb pull /" + img)
+        #os.system("adb pull /" + orig_img)
         frame = cv2.imread(img)
         cv2.imshow('capture', frame)
         if cv2.waitKey(1)&0xFF==ord('q'):#按键盘q就停止拍照
@@ -21,6 +23,7 @@ def main():
         if (i >= 6):
             i = 0
         #os.system("mv " + img + " " + str(t) + ".jpeg")
+        #os.system("mv " + orig_img + " " + str(t) + "_orig.jpeg")
     cv2.destroyAllWindows()
 
 

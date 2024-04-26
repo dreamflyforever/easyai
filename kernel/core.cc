@@ -63,7 +63,22 @@ cv::Mat camera_read(session_str * entity)
 #endif
 	g_cap >> g_bgr;
 	transpose(g_bgr, g_bgr);   
-	flip(g_bgr, g_bgr, 0);  //rotate 90 
+	flip(g_bgr, g_bgr, 180);  //rotate 90 
+#if 1
+		char *str = (char *)malloc(20);
+		memset(str, 0, 20);
+		static int t = 0;
+		sprintf(str, "%d_orig.jpeg", t);
+		cv::imwrite(str, g_bgr);
+		free(str);
+		t++;
+		/* because the flash is only 24MB*/
+		if (t >= 5) {
+			t = -1;
+		}
+
+#endif
+
 	return g_bgr;
 
 }
@@ -139,7 +154,7 @@ int session_init(session_str ** entity, const char * model_name)
 	int ret = init_yolov5_model(model_name, &((*entity)->ctx));
 	if (ret != 0) {
 		printf("init_yolov5_model fail! ret=%d model_path=%s\n", ret, model_name);
-		while (1);
+		assert(0);
 		//goto out;
 	}
 	(*entity)->src_image.width = 640;//img.rows;
