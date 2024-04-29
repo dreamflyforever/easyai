@@ -62,20 +62,20 @@ cv::Mat camera_read(session_str * entity)
 	entity->cap >> entity->bgr;
 #endif
 	g_cap >> g_bgr;
-	transpose(g_bgr, g_bgr);   
-	flip(g_bgr, g_bgr, 180);  //rotate 90 
+	//transpose(g_bgr, g_bgr);   
+	//flip(g_bgr, g_bgr, 180);  //rotate 90 
 #if 1
-		char *str = (char *)malloc(20);
-		memset(str, 0, 20);
-		static int t = 0;
-		sprintf(str, "%d_orig.jpeg", t);
-		cv::imwrite(str, g_bgr);
-		free(str);
-		t++;
-		/* because the flash is only 24MB*/
-		if (t >= 5) {
-			t = -1;
-		}
+	char *str = (char *)malloc(20);
+	memset(str, 0, 20);
+	static int t = 0;
+	sprintf(str, "%d_orig.jpeg", t);
+	cv::imwrite(str, g_bgr);
+	free(str);
+	t++;
+	/* because the flash is only 24MB*/
+	if (t >= 6) {
+		t = 0;
+	}
 
 #endif
 

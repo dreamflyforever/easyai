@@ -154,9 +154,7 @@ int alsa_play(char * path)
 	while (1)
 	{
 		rc = fread(gp_buffer, g_bufsize, 1, fp);
-		if (rc <1)
-		{
-			printf("error open file\n");
+		if (rc <1) {
 			break;
 		}
 		
