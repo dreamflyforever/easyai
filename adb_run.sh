@@ -3,7 +3,10 @@ adb push install/rv1106_linux_armhf/rknn__demo/easyai  /oem/ws
 adb shell mkdir -p /oem/ws/model
 adb push install/rv1106_linux_armhf/rknn__demo/model/check_people.wav /oem/ws/model
 adb push install/rv1106_linux_armhf/rknn__demo/model/check_sleep.wav /oem/ws/model
-adb push install/rv1106_linux_armhf/rknn__demo/model/normal.wav /oem/ws/model
+adb push install/rv1106_linux_armhf/rknn__demo/model/normal1.wav /oem/ws/model
+adb push install/rv1106_linux_armhf/rknn__demo/model/normal0.wav /oem/ws/model
+adb push install/rv1106_linux_armhf/rknn__demo/model/normal2.wav /oem/ws/model
+adb push install/rv1106_linux_armhf/rknn__demo/model/bb.wav /oem/ws/model
 adb push install/rv1106_linux_armhf/rknn__demo/model/welcome.wav /oem/ws/model
 adb push install/rv1106_linux_armhf/rknn__demo/model/labels_list.txt /oem/ws/model
 

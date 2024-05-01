@@ -6,6 +6,8 @@ extern int buzzer_init(int gpio_pin);
 int sleep_times;
 int noface_times;
 int lr_times;
+int phone_times;
+int normal_times;
 
 int main(int argc, char **argv)
 {
@@ -30,29 +32,36 @@ int main(int argc, char **argv)
 		(ret == 2) ? sleep_times++ : sleep_times = 0;
 		(ret == -1)? noface_times++ : noface_times = 0;
 		(ret == 0) ? lr_times++ : lr_times = 0;
+		(ret == 3) ? phone_times++ : phone_times = 0;
+		(ret == 1) ? normal_times++ : normal_times = 0;
 		switch (ret) {
 		case 0:
-			if (lr_times>=5)
+			if (lr_times>=15)
 				put_buzzer("/oem/ws/model/leftright.wav");
 			break;
 		case 1:
-			//put_buzzer("/oem/ws/model/child.wav");
+			if (normal_times>=(10 * 1800)) {
+				int a;
+				srand((unsigned)time(NULL));
+				a = rand();
+				char tmp[100] = {0};
+				snprintf(tmp, 100, "/oem/ws/model/normal%d.wav", a%3);
+				put_buzzer(tmp);
+				normal_times = 0;
+			}
 			break;
 		case 2:
-			if (sleep_times>=4)
+			if ((sleep_times>=4) && (sleep_times < 7))
 				put_buzzer("/oem/ws/model/check_sleep.wav");
+			if (sleep_times>=7)
+				put_buzzer("/oem/ws/model/bb.wav");
+
 			break;
 		case 3:
-			put_buzzer("/oem/ws/model/mobile.wav");
+			if (phone_times>=2)
+				put_buzzer("/oem/ws/model/mobile.wav");
 			break;
 
-		case 4:
-			//put_buzzer("/oem/ws/model/normal.wav");
-			break;
-
-		case 5:
-			//put_buzzer("/oem/ws/model/talking.wav");
-			break;
 		default:
 			if (noface_times>=5)
 				put_buzzer("/oem/ws/model/verify.wav");
