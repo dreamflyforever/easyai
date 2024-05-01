@@ -17,7 +17,7 @@ adb push kernel/model/talking.wav /oem/ws/model
 adb push kernel/model/verify.wav /oem/ws/model
 
 adb push 3rdparty/alsa/share/alsa/alsa.conf /oem/ws/share/alsa/alsa.conf
-adb push install/rv1106_linux_armhf/rknn__demo/model/sleep_v51.rknn /userdata/
+adb push install/rv1106_linux_armhf/rknn__demo/model/sleep_v55.rknn /userdata/
 adb push RkLunch.sh /oem/usr/bin/RkLunch.sh
 adb push lib/librknnmrt.* /oem/usr/lib/
 adb shell reboot
