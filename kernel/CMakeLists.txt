@@ -37,6 +37,8 @@ add_executable(${PROJECT_NAME}
     ../app/device.cc
     ../app/alsa.cc
     ../app/is_night.cc
+    ../3rdparty/ipcm/baselib/api.cc
+    ../3rdparty/ipcm/baselib/mongoose.cc
     ${rknpu2_yolov5_file}
 )
 
@@ -65,6 +67,7 @@ target_include_directories(${PROJECT_NAME} PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${LIBRKNNRT_INCLUDES}
     ${LIBALSA_INCLUDES}
+    ../3rdparty/ipcm/baselib/
 )
 
 install(TARGETS ${PROJECT_NAME} DESTINATION .)

@@ -82,4 +82,9 @@ int is_night_thread();
 #define os_printf(format, ...) 
 #endif
 
+#define MQTT 0
+#if MQTT
+#include "api.h"
+#endif
+
 #endif

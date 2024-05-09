@@ -23,6 +23,10 @@ int main(int argc, char **argv)
 	camera_init(entity);
 	put_buzzer("/oem/ws/model/welcome.wav");
 	is_night_thread();
+#if MQTT
+	mqtt_init();
+	pub("hello", "12344", 5);
+#endif
 	while (1) {
 		camera_read(entity);
 		preprocess(entity);
