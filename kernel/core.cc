@@ -467,12 +467,11 @@ int detect_is_day()
 	}
 
 	averageBrightness = calculateImageBrightness(image);  // 计算图片的亮度平均值
-	printf("bright: %d\n", averageBrightness);
 	if (averageBrightness < 83126523) {
-		printf("is night\n");
+		printf(">>>>>> bright: %d, is night\n", averageBrightness);
 		retval = 0;
 	} else {
-		printf("is day \n");
+		printf(">>>>>> bright: %d, is day\n", averageBrightness);
 		retval = 1;
 	}
 end:
