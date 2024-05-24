@@ -357,7 +357,7 @@ int main(int argc, char **argv)
 		char *str = (char *)malloc(20);
 		memset(str, 0, 20);
 		static int t = 0;
-		sprintf(str, "%d_out.jpeg", t);
+		sprintf(str, "%d_out.jpg", t);
 		write_image(str, &src_image);
 		free(str);
 		t++;
@@ -465,9 +465,11 @@ int detect_is_day()
 		retval = -1;
 		goto end;
 	}
+	/*close IR led to check brightness*/
+	system("echo 1 > /sys/class/gpio/gpio54/value");
 
 	averageBrightness = calculateImageBrightness(image);  // 计算图片的亮度平均值
-	if (averageBrightness < 83126523) {
+	if (averageBrightness < 33126523) {
 		printf(">>>>>> bright: %d, is night\n", averageBrightness);
 		retval = 0;
 	} else {
