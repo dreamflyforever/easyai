@@ -44,7 +44,7 @@ int main(int argc, char **argv)
 				put_buzzer("/oem/ws/model/leftright.wav");
 			break;
 		case 1:
-			if (normal_times>=(10 * 1800)) {
+			if (normal_times>=(5 * 10 * 60)) {
 				int a;
 				srand((unsigned)time(NULL));
 				a = rand();
@@ -62,13 +62,19 @@ int main(int argc, char **argv)
 
 			break;
 		case 3:
-			if (phone_times>=2)
+			if (phone_times>=10)
 				put_buzzer("/oem/ws/model/mobile.wav");
 			break;
 
 		default:
-			if (noface_times>=5)
+			if (noface_times>=10) {
+				system("echo 0 > /sys/class/gpio/gpio54/value");
+			}
+			if (noface_times>=20) {
 				put_buzzer("/oem/ws/model/verify.wav");
+				/*open IR led*/
+				system("echo 0 > /sys/class/gpio/gpio54/value");
+			}
 			break;
 		}
 		updatefps();
