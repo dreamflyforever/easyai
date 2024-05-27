@@ -34,6 +34,6 @@ void * day_run(void * arg)
 			system("echo 0 > /sys/class/gpio/gpio54/value");
 
 		}
-		sleep(60);
+		sleep(10);
 	}
 }
