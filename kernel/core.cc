@@ -62,9 +62,6 @@ cv::Mat camera_read(session_str * entity)
 	entity->cap >> entity->bgr;
 #endif
 	g_cap >> g_bgr;
-	cv::cvtColor(g_bgr, g_bgr, cv::COLOR_BGR2GRAY);
-	//transpose(g_bgr, g_bgr);   
-	//flip(g_bgr, g_bgr, 180);  //rotate 90 
 #if 1
 	char *str = (char *)malloc(20);
 	memset(str, 0, 20);
@@ -79,6 +76,9 @@ cv::Mat camera_read(session_str * entity)
 	}
 
 #endif
+	cv::cvtColor(g_bgr, g_bgr, cv::COLOR_BGR2GRAY);
+	//transpose(g_bgr, g_bgr);   
+	//flip(g_bgr, g_bgr, 180);  //rotate 90 
 
 	return g_bgr;
 
