@@ -136,13 +136,18 @@ int postprocess(session_str * entity)
 		}
 
 #endif
-		sprintf(text, "%s %.1f%%", coco_cls_to_name(det_result->cls_id), det_result->prop * 100);
+		sprintf(text, "%s %.1f%%, ((%d %d %d %d))",
+			coco_cls_to_name(det_result->cls_id),
+			det_result->prop * 100, x1, y1, x2, y2);
+
 		draw_text(&(entity->src_image), text, x1, y1 - 20, COLOR_RED, 10);
 		retval = det_result->cls_id;
 
 		if (det_result->cls_id == 3) {
-			retval = det_result->cls_id;
-			break;
+			if (x1 > 200) {
+				retval = det_result->cls_id;
+				break;
+			}
 		} else {
 			if (far_left < x1) {
 				far_left = x1;
