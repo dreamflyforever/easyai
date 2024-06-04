@@ -33,7 +33,7 @@ int main(int argc, char **argv)
 		inference(entity);
 		ret = postprocess(entity);
 		printf(">>>>>>>>>>>%d\n", ret);
-		(ret == 2) ? sleep_times++ : sleep_times = 0;
+		((ret == 2) || (ret == 4) || (ret == 5)) ? sleep_times++ : sleep_times = 0;
 		(ret == -1)? noface_times++ : noface_times = 0;
 		(ret == 0) ? lr_times++ : lr_times = 0;
 		(ret == 3) ? phone_times++ : phone_times = 0;
@@ -55,8 +55,18 @@ int main(int argc, char **argv)
 			}
 			break;
 		case 2:
-			if ((sleep_times>=4) && (sleep_times < 7))
-				put_buzzer("/oem/ws/model/check_sleep.wav");
+		case 4:
+		case 5:
+			if ((sleep_times>=4) && (sleep_times < 7)) {
+				if (ret == 2) {
+					put_buzzer("/oem/ws/model/headdown.wav");
+
+				} else if (ret == 4) {
+					put_buzzer("/oem/ws/model/check_sleep.wav");
+				} else {
+					put_buzzer("/oem/ws/model/openmouth.wav");
+				}
+			}
 			if (sleep_times>=7)
 				put_buzzer("/oem/ws/model/bb.wav");
 
@@ -64,6 +74,7 @@ int main(int argc, char **argv)
 		case 3:
 			if (phone_times>=10)
 				put_buzzer("/oem/ws/model/mobile.wav");
+
 			break;
 
 		default:

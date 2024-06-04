@@ -1,4 +1,6 @@
-LeftRight
+leftright
 normal
-drowsy
+headdown
 mobile
+eyeclose
+openmouth
