@@ -1,3 +1,4 @@
+#include <sys/time.h>
 #include "core.h"
 
 extern void put_buzzer(char * speech);
@@ -62,7 +63,13 @@ int main(int argc, char **argv)
 					put_buzzer("/oem/ws/model/headdown.wav");
 
 				} else if (ret == 4) {
-					put_buzzer("/oem/ws/model/check_sleep.wav");
+					struct timeval tv;
+					gettimeofday(&tv, NULL);
+					printf("second: %ld\n", tv.tv_sec);
+					if ((tv.tv_sec % 3) == 1)
+						put_buzzer("/oem/ws/model/openmouth.wav");
+					else
+						put_buzzer("/oem/ws/model/check_sleep.wav");
 				} else {
 					put_buzzer("/oem/ws/model/openmouth.wav");
 				}
