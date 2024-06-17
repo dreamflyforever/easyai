@@ -14,6 +14,8 @@ int main(int argc, char **argv)
 {
 	os_printf("compile time : %s\n", __TIME__);
 	int ret;
+	int is_run = 1;
+	int first_check = 1;
 	if (argc != 2) {
 		printf("%s <model_path>\n", argv[0]);
 		return -1;
@@ -45,6 +47,7 @@ int main(int argc, char **argv)
 				put_buzzer("/oem/ws/model/leftright.wav");
 			break;
 		case 1:
+			first_check = 0;
 			if (normal_times>=(5 * 10 * 60)) {
 				int a;
 				srand((unsigned)time(NULL));
@@ -59,20 +62,16 @@ int main(int argc, char **argv)
 		case 4:
 		case 5:
 			if ((sleep_times>=4) && (sleep_times < 7)) {
-				if (ret == 2) {
-					put_buzzer("/oem/ws/model/headdown.wav");
-
-				} else if (ret == 4) {
 					struct timeval tv;
 					gettimeofday(&tv, NULL);
 					printf("second: %ld\n", tv.tv_sec);
-					if ((tv.tv_sec % 3) == 1)
+					int select = (tv.tv_sec % 3);
+					if (select == 1)
 						put_buzzer("/oem/ws/model/openmouth.wav");
+					else if (select == 2)
+						put_buzzer("/oem/ws/model/headdown.wav");
 					else
 						put_buzzer("/oem/ws/model/check_sleep.wav");
-				} else {
-					put_buzzer("/oem/ws/model/openmouth.wav");
-				}
 			}
 			if (sleep_times>=7)
 				put_buzzer("/oem/ws/model/bb.wav");
@@ -85,13 +84,15 @@ int main(int argc, char **argv)
 			break;
 
 		default:
-			if (noface_times>=10) {
-				system("echo 0 > /sys/class/gpio/gpio54/value");
-			}
-			if (noface_times>=20) {
-				put_buzzer("/oem/ws/model/verify.wav");
-				/*open IR led*/
-				system("echo 0 > /sys/class/gpio/gpio54/value");
+			if (first_check || is_run) {
+				if (noface_times>=10) {
+					system("echo 0 > /sys/class/gpio/gpio54/value");
+				}
+				if (noface_times>=20) {
+					put_buzzer("/oem/ws/model/verify.wav");
+					/*open IR led*/
+					system("echo 0 > /sys/class/gpio/gpio54/value");
+				}
 			}
 			break;
 		}

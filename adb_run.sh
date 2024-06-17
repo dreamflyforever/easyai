@@ -19,7 +19,7 @@ adb push ertong/* /oem/ws/model/
 adb push 3rdparty/alsa/share/alsa/alsa.conf /oem/ws/share/alsa/alsa.conf
 #adb push install/rv1106_linux_armhf/rknn__demo/model/sleep_v55.rknn /userdata/
 adb push rm /userdata/sleep_v80.rknn 
-adb push sleep_v81/exp41/weights/sleep_v81.rknn /userdata/
+adb push sleep_v71/weights/sleep_v71.rknn /userdata/
 adb push RkLunch.sh /oem/usr/bin/RkLunch.sh
 adb push lib/librknnmrt.* /oem/usr/lib/
 

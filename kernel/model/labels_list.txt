@@ -2,5 +2,3 @@ leftright
 normal
 headdown
 mobile
-eyeclose
-openmouth
