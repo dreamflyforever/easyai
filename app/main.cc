@@ -47,7 +47,10 @@ int main(int argc, char **argv)
 				put_buzzer("/oem/ws/model/leftright.wav");
 			break;
 		case 1:
-			first_check = 0;
+			if (first_check == 1) {
+				put_buzzer("/oem/ws/model/first_check.wav");
+				first_check = 0;
+			}
 			if (normal_times>=(5 * 10 * 60)) {
 				int a;
 				srand((unsigned)time(NULL));
