@@ -22,6 +22,7 @@ adb push rm /userdata/sleep_v80.rknn
 adb push sleep_v71/weights/sleep_v71.rknn /userdata/
 adb push RkLunch.sh /oem/usr/bin/RkLunch.sh
 adb push lib/librknnmrt.* /oem/usr/lib/
+adb push 3rdparty/i2clib/lib/*.a /oem/usr/lib/
 
 adb push tts_audio/open_ir.wav /oem/ws/model
 adb push tts_audio/close_ir.wav /oem/ws/model

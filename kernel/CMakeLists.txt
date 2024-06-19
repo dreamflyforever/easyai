@@ -20,6 +20,8 @@ if (TARGET_SOC STREQUAL "rv1106" OR TARGET_SOC STREQUAL "rv1103")
     include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../3rdparty/allocator/dma)
     #alsa 
     include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../3rdparty/alsa/include)
+    # i2c
+    include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../3rdparty/i2clib/include)
 endif()
 
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../3rdparty/ 3rdparty.out)
@@ -33,6 +35,7 @@ file(GLOB SRCS ${CMAKE_CURRENT_SOURCE_DIR}/*.cc)
 add_executable(${PROJECT_NAME}
     core.cc
     postprocess.cc
+    ../app/lis3dh.cc
     ../app/main.cc
     ../app/device.cc
     ../app/alsa.cc
@@ -49,6 +52,7 @@ target_link_libraries(${PROJECT_NAME}
     ${LIBRKNNRT}
     ${OpenCV_LIBS}
     ${LIBALSA}
+    ${LIBI2C}
 )
 
 if (CMAKE_SYSTEM_NAME STREQUAL "Android")
