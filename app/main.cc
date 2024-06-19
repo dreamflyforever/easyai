@@ -45,6 +45,7 @@ int main(int argc, char **argv)
 		(ret == 1) ? normal_times++ : normal_times = 0;
 		switch (ret) {
 		case 0:
+			if (get_device_status() == 0) break;
 			if (lr_times>=15)
 				put_buzzer("/oem/ws/model/leftright.wav");
 			break;
@@ -53,6 +54,7 @@ int main(int argc, char **argv)
 				put_buzzer("/oem/ws/model/first_check.wav");
 				first_check = 0;
 			}
+			if (get_device_status() == 0) break;
 			if (normal_times>=(5 * 10 * 60)) {
 				int a;
 				srand((unsigned)time(NULL));
@@ -66,6 +68,7 @@ int main(int argc, char **argv)
 		case 2:
 		case 4:
 		case 5:
+			if (get_device_status() == 0) break;
 			if ((sleep_times>=4) && (sleep_times < 7)) {
 					struct timeval tv;
 					gettimeofday(&tv, NULL);
@@ -83,7 +86,7 @@ int main(int argc, char **argv)
 
 			break;
 		case 3:
-			if (phone_times>=10)
+			if (phone_times>=10 || get_device_status())
 				put_buzzer("/oem/ws/model/mobile.wav");
 
 			break;
