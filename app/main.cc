@@ -3,6 +3,8 @@
 
 extern void put_buzzer(char * speech);
 extern int buzzer_init(int gpio_pin);
+extern int get_device_status();
+extern int is_device_run();
 
 int sleep_times;
 int noface_times;
@@ -14,7 +16,6 @@ int main(int argc, char **argv)
 {
 	os_printf("compile time : %s\n", __TIME__);
 	int ret;
-	int is_run = 1;
 	int first_check = 1;
 	if (argc != 2) {
 		printf("%s <model_path>\n", argv[0]);
@@ -26,6 +27,7 @@ int main(int argc, char **argv)
 	camera_init(entity);
 	put_buzzer("/oem/ws/model/welcome.wav");
 	is_night_thread();
+	is_device_run();
 #if MQTT
 	mqtt_init();
 	pub("hello", "12344", 5);
@@ -87,7 +89,7 @@ int main(int argc, char **argv)
 			break;
 
 		default:
-			if (first_check || is_run) {
+			if (first_check || get_device_status()) {
 				if (noface_times>=10) {
 					system("echo 0 > /sys/class/gpio/gpio54/value");
 				}

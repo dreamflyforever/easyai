@@ -6,6 +6,7 @@
 #include <linux/i2c-dev.h>
 #include <stdint.h>
 #include <pthread.h>
+#include <math.h>
 
 #define I2C_DEVICE "/dev/i2c-3" //
 #define LIS3DHTR_ADDR 0x19      
@@ -73,7 +74,7 @@ void * lis3hd_main(void * arg)
 
 	// init ctrl reg1, x,y,z 100Hz, 0x57 = 0b01010111
 	i2c_write(i2c_file, CTRL_REG1, 0x57); 
-	int sum;
+	float sum;
 	while(1) {
 
 		uint8_t accel_data[6];
@@ -90,9 +91,10 @@ void * lis3hd_main(void * arg)
 		float accel_z_g = accel_z / 16384.0;
 
 		sleep(1);
-		sum = abs(accel_x ) + abs(accel_y ) + abs(accel_z);
+		sum = fabs(accel_x_g ) + fabs(accel_y_g ) + fabs(accel_z_g) - 0.98;
 		(sum >= 0.75)? g_is_run = 1: g_is_run = 0;
-		printf("accelerometer data: X=%.2f g, Y=%.2f g, Z=%.2f g, sum: %d\n", accel_x_g, accel_y_g, accel_z_g, sum);
+		printf("accelerometer data: X=%.2f g, Y=%.2f g, Z=%.2f g, sum: %.2f\n", accel_x_g, accel_y_g, accel_z_g, sum);
+
 
 	}
 
