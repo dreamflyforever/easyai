@@ -140,11 +140,11 @@ int postprocess(session_str * entity)
 			coco_cls_to_name(det_result->cls_id),
 			det_result->prop * 100, x1, y1, x2, y2);
 
-		draw_text(&(entity->src_image), text, x1, y1 - 20, COLOR_RED, 10);
+		draw_text(&(entity->src_image), text, x1, y1, COLOR_RED, 10);
 		retval = det_result->cls_id;
 
 		if (det_result->cls_id == 3) {
-			if (x1 > 200) {
+			if ((x1 > 200) & (y1 < 10)) {
 				retval = det_result->cls_id;
 				break;
 			}
