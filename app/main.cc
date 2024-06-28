@@ -28,6 +28,7 @@ int main(int argc, char **argv)
 	session_init(&entity, argv[1]);
 	camera_init(entity);
 	put_buzzer("/oem/ws/model/welcome.wav");
+	sleep(4);
 	is_night_thread();
 	is_device_run();
 #if MQTT
@@ -53,7 +54,7 @@ int main(int argc, char **argv)
 			break;
 		case 1:
 			if (first_check == 1) {
-				sleep(4);
+				sleep(2);
 				put_buzzer("/oem/ws/model/first_check.wav");
 				first_check = 0;
 			}
