@@ -46,6 +46,13 @@ int main(int argc, char **argv)
 		(ret == 0) ? lr_times++ : lr_times = 0;
 		(ret == 3) ? phone_times++ : phone_times = 0;
 		(ret == 1) ? normal_times++ : normal_times = 0;
+#if 0
+		if (get_device_status() == 0) {
+			put_buzzer("/oem/ws/stop.wav");
+		} else {
+			put_buzzer("/oem/ws/run.wav");
+		};
+#endif
 		switch (ret) {
 		case 0:
 			STATUS_CONDITION;
@@ -92,6 +99,8 @@ int main(int argc, char **argv)
 
 			break;
 		case 3:
+			if (first_check) 
+				put_buzzer("/oem/ws/model/verify.wav");
 			STATUS_CONDITION;
 			if (phone_times>=10)
 				put_buzzer("/oem/ws/model/mobile.wav");

@@ -144,7 +144,7 @@ int postprocess(session_str * entity)
 		retval = det_result->cls_id;
 
 		if (det_result->cls_id == 3) {
-			if ((x1 > 200) & (y1 < 10)) {
+			if ((x1 > 200) & (y1 > 10)) {
 				retval = det_result->cls_id;
 				break;
 			}
