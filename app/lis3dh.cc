@@ -21,11 +21,12 @@
 #define OUT_Z_L      0x2C       // Z 
 #define OUT_Z_H      0x2D       // Z 
 
-#define QUEUE_SIZE 100
-#define THRESHOLD 0.07
+#define QUEUE_SIZE 300
+#define THRESHOLD 0.04
 #define RUN 1
 #define STOP 0
-
+#define DEBUG 1
+#define MAX_COUNT 10000000
 
 typedef struct {
     float data[QUEUE_SIZE];
@@ -132,8 +133,11 @@ static float g_meanChangeRate;
 // return
 // 0-stop, 1-run
 int get_device_status() {
-    if (g_meanChangeRate > THRESHOLD)
+    if (g_meanChangeRate > THRESHOLD) {
+        printf("send RUN to upstream task!\n");
         return RUN;
+    } 
+    printf("send STOP to upstream task!\n");
     return STOP;
 }
 
@@ -172,9 +176,11 @@ void * lis3hd_main(void * arg)
     initQueue(&absQueue);
     initQueue(&changeRateQueue);
 
-    float dt = 0.1; // 10ms
+    float dt = 0.01; // 10ms
+    int print_period = 10;
     struct timespec sleep_time = {0, dt * 1000000000L}; // 
     int cnt = 0;
+    int drop_first = 1;
 
     while (1) {
         uint8_t accel_data[6];
@@ -198,12 +204,19 @@ void * lis3hd_main(void * arg)
 	    g_meanChangeRate = meanChangeRate;
 
         // send STOP to upstream task before first 10s(100ms * 100)
-        if (cnt < 100) {
-            cnt++;
-            g_meanChangeRate = 0;       
+        if (drop_first)
+            if (cnt < QUEUE_SIZE) {
+                cnt++;
+                g_meanChangeRate = 0;       
+            } else {
+                drop_first = 0;
+            }
+        
+        if (DEBUG) {
+            cnt = (cnt + 1) % MAX_COUNT;
+            if (cnt % print_period == 1)
+                printf("Acceleration: X=%.4f g, Y=%.4f g, Z=%.4f g, Mean Change Rate: %.4f\n", accel_x_g, accel_y_g, accel_z_g, meanChangeRate);
         }
-
-        printf("Acceleration: X=%.4f g, Y=%.4f g, Z=%.4f g, Mean Change Rate: %.4f\n", accel_x_g, accel_y_g, accel_z_g, meanChangeRate);
 
         nanosleep(&sleep_time, NULL);
     }
