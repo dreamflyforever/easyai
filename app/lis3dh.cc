@@ -62,7 +62,7 @@ void enqueue(FIFOQueue* queue, float value) {
 float dequeue(FIFOQueue* queue) {
     if (isEmpty(queue)) {
         printf("Queue is empty\n");
-        exit(1);
+	return -1;
     }
     float value = queue->data[queue->front];
     queue->front = (queue->front + 1) % QUEUE_SIZE;
@@ -73,7 +73,7 @@ float dequeue(FIFOQueue* queue) {
 float getQueueElement(FIFOQueue* queue, int index) {
     if (index < 0 || index >= queue->count) {
         printf("Index out of bounds\n");
-        exit(1);
+	return -1;
     }
     return queue->data[(queue->front + index) % QUEUE_SIZE];
 }
@@ -146,20 +146,20 @@ void * lis3hd_main(void * arg)
     int i2c_file = open(I2C_DEVICE, O_RDWR);
     if (i2c_file < 0) {
         perror("Failed to open the i2c bus");
-        exit(1);
+	return NULL;
     }
 
     if (ioctl(i2c_file, I2C_SLAVE, LIS3DHTR_ADDR) < 0) {
         perror("Failed to acquire bus access and/or talk to slave");
         close(i2c_file);
-        exit(1);
+	return NULL;
     }
 
     uint8_t who_am_i = i2c_read_byte(i2c_file, WHO_AM_I);
     if (who_am_i != 0x33) {
         fprintf(stderr, "Failed to connect to LIS3DHTR: WHO_AM_I = 0x%02X\n", who_am_i);
         close(i2c_file);
-        exit(1);
+        return NULL;
     }
 
     i2c_write(i2c_file, CTRL_REG1, 0x57); // 0x57 = 0b01010111
