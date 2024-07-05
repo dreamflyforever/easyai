@@ -1,18 +1,11 @@
 #include <sys/time.h>
 #include "core.h"
 
-#define CAR 1
+#define CAR 0
 
 extern void put_buzzer(char * speech);
 extern int buzzer_init(int gpio_pin);
-#if CAR
 extern int get_device_status();
-#else
-int get_device_status()
-{
-	return 1;
-}
-#endif
 extern int is_device_run();
 
 int sleep_times;
@@ -21,7 +14,11 @@ int lr_times;
 int phone_times;
 int normal_times;
 
+#if CAR
 #define STATUS_CONDITION if (get_device_status() == 0) break;
+#else
+#define STATUS_CONDITION
+#endif
 
 int main(int argc, char **argv)
 {
@@ -117,7 +114,11 @@ int main(int argc, char **argv)
 			break;
 
 		default:
+			#if CAR
 			if (first_check || get_device_status()) {
+			#else
+			if (1) {
+			#endif
 				if (noface_times>=10) {
 					system("echo 0 > /sys/class/gpio/gpio54/value");
 				}
