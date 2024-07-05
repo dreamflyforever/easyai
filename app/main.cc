@@ -1,9 +1,18 @@
 #include <sys/time.h>
 #include "core.h"
 
+#define CAR 1
+
 extern void put_buzzer(char * speech);
 extern int buzzer_init(int gpio_pin);
+#if CAR
 extern int get_device_status();
+#else
+int get_device_status()
+{
+	return 1;
+}
+#endif
 extern int is_device_run();
 
 int sleep_times;
