@@ -1,7 +1,7 @@
 #include <sys/time.h>
 #include "core.h"
 
-#define CAR 0
+#define CAR 1
 
 extern void put_buzzer(char * speech);
 extern int buzzer_init(int gpio_pin);
@@ -119,7 +119,7 @@ int main(int argc, char **argv)
 			#else
 			if (1) {
 			#endif
-				if (noface_times>=10) {
+				if (noface_times>=1) {
 					system("echo 0 > /sys/class/gpio/gpio54/value");
 				}
 				if (noface_times>=20) {

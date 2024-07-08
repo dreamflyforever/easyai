@@ -475,7 +475,7 @@ int detect_is_day()
 	system("echo 1 > /sys/class/gpio/gpio54/value");
 
 	averageBrightness = calculateImageBrightness(image);  // 计算图片的亮度平均值
-	if (averageBrightness < 33126523) {
+	if (averageBrightness < 43126523) {
 		printf(">>>>>> bright: %d, is night\n", averageBrightness);
 		retval = 0;
 	} else {
