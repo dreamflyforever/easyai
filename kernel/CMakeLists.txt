@@ -34,7 +34,6 @@ file(GLOB SRCS ${CMAKE_CURRENT_SOURCE_DIR}/*.cc)
 
 add_executable(${PROJECT_NAME}
     core.cc
-    postprocess.cc
     ../app/lis3dh.cc
     ../app/main.cc
     ../app/device.cc
@@ -42,7 +41,6 @@ add_executable(${PROJECT_NAME}
     ../app/is_night.cc
     ../3rdparty/ipcm/baselib/api.cc
     ../3rdparty/ipcm/baselib/mongoose.cc
-    ${rknpu2_yolov5_file}
 )
 
 target_link_libraries(${PROJECT_NAME}
@@ -53,6 +51,7 @@ target_link_libraries(${PROJECT_NAME}
     ${OpenCV_LIBS}
     ${LIBALSA}
     ${LIBI2C}
+    ${LIBALGO}
 )
 
 if (CMAKE_SYSTEM_NAME STREQUAL "Android")
