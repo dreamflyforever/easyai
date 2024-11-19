@@ -31,8 +31,23 @@ set(CMAKE_INSTALL_RPATH "$ORIGIN/lib")
 
 file(GLOB SRCS ${CMAKE_CURRENT_SOURCE_DIR}/*.cc)
 
+include_directories(${OpenCV_INCLUDE_DIRS})
+add_library(algo SHARED
+        postprocess.cc
+    	${rknpu2_yolov5_file}
+        )
+target_include_directories(algo PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}
+    ${LIBRKNNRT_INCLUDES}
+    ${LIBALSA_INCLUDES}
+    ../3rdparty/ipcm/baselib/
+    ../3rdparty/rknpu2/include
+    ../utils
+    .././3rdparty/librga/include
+)
 
 add_executable(${PROJECT_NAME}
+    #postprocess.cc
     core.cc
     ../app/lis3dh.cc
     ../app/main.cc
