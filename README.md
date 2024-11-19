@@ -1,13 +1,42 @@
 ## easyai
-detect object in rv1103 platform
+AI detects driver drowsiness using the RV1103 platform.
 
 ## compile
 ./build-linux.sh
 
 ## usage
-host : adb push install/rv1106_linux_armhf/rknn__demo/*   /oem/ws/  
- adb push 3rdparty/alsa/share/alsa/alsa.conf /oem/ws/share/alsa
-board: ./rknn_yolov5_demo ./model/yolov5s-640-640.rknn
+excute './adb_push.sh'
+
+## flowchart
+
+```mermaid
+graph TD;
+    A[开机] --> B[播放声音: 欢迎使用AI疲劳检测];
+    B --> C[是否检测到人脸?];
+    C -->|是| D[播放声音: 安全小助手已就绪 守护主人的安全];
+    D --> E[车静止或等红灯 设备不发出声音];
+    E --> F[闭眼2秒检测到 安全小助手提醒疲劳 请专心开车];
+    E --> G[玩手5秒检测到 安全小助手提醒分心 请专心开车];
+    C -->|否| H[播放声音: 安全小助手请主人正 对前方];
+    H --> I[检测低头2秒 安全小助手提醒 请抬头];
+    I --> J[检测打哈欠2秒 安全小助手提醒 请保持清醒];
+flowchart TD
+    A["开机"] --> B{"是否检测到人脸？"}
+    B -->|是| C["播放提示音：已检测到驾驶员"]
+    B -->|否| D["播放提示音：摄像头正对前方"]
+    C --> E["开始检测驾驶机状态"]
+    E --> F["检测2秒后发现闭眼"]
+    E --> G["玩手机5秒"]
+    E --> H["左顾右盼7秒"]
+    E --> I["检测低头2秒"]
+    E --> J["检测打哈欠2秒"]
+    F --> K["播放提示音：注意疲劳驾驶"]
+    G --> L["播放提示音：请将手机放下专注驾驶"]
+    H --> M["播放提示音：请勿左顾右盼，请专心"]
+    I --> N["播放提示音：请将目视前方，保持专注"]
+    J --> O["播放提示音：注意疲劳，请合理安排休息"]
+    D --> B
+```
 
 ## license
-MIT
+MIT by Jim
