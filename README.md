@@ -29,4 +29,4 @@ flowchart TD
 ```
 
 ## license
-MIT by Jim
+MIT License by Jim
