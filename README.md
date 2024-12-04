@@ -28,30 +28,13 @@ flowchart TD
     D --> B
 ```
 
-## 上车红外测试
-<video width="2160" height="3840" controls>
-  <source src="video/ir.mov" type="video/mp4">
-  Your browser does not support the video tag.
-</video>
+[上车红外测试](https://github.com/dreamflyforever/easyai/blob/main/video/ir.mov)
 
-## 上车正常测试
-<video width="2160" height="3840" controls>
-  <source src="video/realscene.mov" type="video/mp4">
-  Your browser does not support the video tag.
-</video>
+[上车正常测试](https://github.com/dreamflyforever/easyai/blob/main/video/realscene.mov)
 
-## 多人测试 
-<video width="1286" height="1328" controls>
-  <source src="video/multipeople.mov" type="video/mov">
-  Your browser does not support the video tag.
-</video>
+[多人测试](https://github.com/dreamflyforever/easyai/blob/main/video/multipeople.mov)
 
-## 模型测试 
-<video width="2160" height="3840" controls>
-  <source src="video/testmodel.mov" type="mov">
-  Your browser does not support the video tag.
-</video>
-
+[模型测试](https://github.com/dreamflyforever/easyai/blob/main/video/testmodel.mov)
 
 ## license
 MIT License by Jim
