@@ -28,13 +28,7 @@ flowchart TD
     D --> B
 ```
 
-[上车红外测试](https://github.com/dreamflyforever/easyai/blob/main/video/ir.mov)
-
-[上车正常测试](https://github.com/dreamflyforever/easyai/blob/main/video/realscene.mov)
-
-[多人测试](https://github.com/dreamflyforever/easyai/blob/main/video/multipeople.mov)
-
-[模型测试](https://github.com/dreamflyforever/easyai/blob/main/video/testmodel.mov)
+[上车测试视频](https://www.bilibili.com/video/BV1fTizYMEKV?vd_source=1b1673dce03ec3272c7540d6228cc14b)
 
 ## license
 MIT License by Jim
